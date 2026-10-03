@@ -198,6 +198,7 @@ export type UserWhereInput = {
   claimsBuilder?: Prisma.ClaimListRelationFilter
   joinedBuildTeams?: Prisma.BuildTeamListRelationFilter
   verifications?: Prisma.MinecraftVerificationsListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -215,6 +216,7 @@ export type UserOrderByWithRelationInput = {
   claimsBuilder?: Prisma.ClaimOrderByRelationAggregateInput
   joinedBuildTeams?: Prisma.BuildTeamOrderByRelationAggregateInput
   verifications?: Prisma.MinecraftVerificationsOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -235,6 +237,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   claimsBuilder?: Prisma.ClaimListRelationFilter
   joinedBuildTeams?: Prisma.BuildTeamListRelationFilter
   verifications?: Prisma.MinecraftVerificationsListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "ssoId">
 
 export type UserOrderByWithAggregationInput = {
@@ -276,6 +279,7 @@ export type UserCreateInput = {
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -293,6 +297,7 @@ export type UserUncheckedCreateInput = {
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -310,6 +315,7 @@ export type UserUpdateInput = {
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -327,6 +333,7 @@ export type UserUncheckedUpdateInput = {
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -409,6 +416,20 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type UserCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
 export type UserCreateNestedOneWithoutCreatedBuildTeamsInput = {
@@ -575,6 +596,90 @@ export type UserUpdateOneRequiredWithoutApplicationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApplicationsInput, Prisma.UserUpdateWithoutApplicationsInput>, Prisma.UserUncheckedUpdateWithoutApplicationsInput>
 }
 
+export type UserCreateWithoutNotificationsInput = {
+  id?: string
+  ssoId: string
+  discordId?: string | null
+  avatar?: string | null
+  username?: string | null
+  minecraft?: string | null
+  reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
+  createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
+  claims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
+  permissions?: Prisma.UserPermissionCreateNestedManyWithoutUserInput
+  claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
+  joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
+  verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  ssoId: string
+  discordId?: string | null
+  avatar?: string | null
+  username?: string | null
+  minecraft?: string | null
+  reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
+  createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
+  claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
+  permissions?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutUserInput
+  claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
+  joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
+  verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+}
+
+export type UserUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ssoId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
+  createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
+  claims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
+  permissions?: Prisma.UserPermissionUpdateManyWithoutUserNestedInput
+  claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
+  joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
+  verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ssoId?: Prisma.StringFieldUpdateOperationsInput | string
+  discordId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
+  createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
+  claims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  permissions?: Prisma.UserPermissionUncheckedUpdateManyWithoutUserNestedInput
+  claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
+  joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
+  verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+}
+
 export type UserCreateWithoutCreatedBuildTeamsInput = {
   id?: string
   ssoId: string
@@ -589,6 +694,7 @@ export type UserCreateWithoutCreatedBuildTeamsInput = {
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedBuildTeamsInput = {
@@ -605,6 +711,7 @@ export type UserUncheckedCreateWithoutCreatedBuildTeamsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedBuildTeamsInput = {
@@ -626,6 +733,7 @@ export type UserCreateWithoutJoinedBuildTeamsInput = {
   permissions?: Prisma.UserPermissionCreateNestedManyWithoutUserInput
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJoinedBuildTeamsInput = {
@@ -642,6 +750,7 @@ export type UserUncheckedCreateWithoutJoinedBuildTeamsInput = {
   permissions?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutUserInput
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJoinedBuildTeamsInput = {
@@ -674,6 +783,7 @@ export type UserUpdateWithoutCreatedBuildTeamsInput = {
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedBuildTeamsInput = {
@@ -690,6 +800,7 @@ export type UserUncheckedUpdateWithoutCreatedBuildTeamsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutJoinedBuildTeamsInput = {
@@ -734,6 +845,7 @@ export type UserCreateWithoutPermissionsInput = {
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPermissionsInput = {
@@ -750,6 +862,7 @@ export type UserUncheckedCreateWithoutPermissionsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPermissionsInput = {
@@ -782,6 +895,7 @@ export type UserUpdateWithoutPermissionsInput = {
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPermissionsInput = {
@@ -798,6 +912,7 @@ export type UserUncheckedUpdateWithoutPermissionsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVerificationsInput = {
@@ -814,6 +929,7 @@ export type UserCreateWithoutVerificationsInput = {
   permissions?: Prisma.UserPermissionCreateNestedManyWithoutUserInput
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVerificationsInput = {
@@ -830,6 +946,7 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   permissions?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutUserInput
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVerificationsInput = {
@@ -862,6 +979,7 @@ export type UserUpdateWithoutVerificationsInput = {
   permissions?: Prisma.UserPermissionUpdateManyWithoutUserNestedInput
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVerificationsInput = {
@@ -878,6 +996,7 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   permissions?: Prisma.UserPermissionUncheckedUpdateManyWithoutUserNestedInput
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClaimsInput = {
@@ -894,6 +1013,7 @@ export type UserCreateWithoutClaimsInput = {
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClaimsInput = {
@@ -910,6 +1030,7 @@ export type UserUncheckedCreateWithoutClaimsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClaimsInput = {
@@ -931,6 +1052,7 @@ export type UserCreateWithoutClaimsBuilderInput = {
   permissions?: Prisma.UserPermissionCreateNestedManyWithoutUserInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClaimsBuilderInput = {
@@ -947,6 +1069,7 @@ export type UserUncheckedCreateWithoutClaimsBuilderInput = {
   permissions?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutUserInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClaimsBuilderInput = {
@@ -979,6 +1102,7 @@ export type UserUpdateWithoutClaimsInput = {
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClaimsInput = {
@@ -995,6 +1119,7 @@ export type UserUncheckedUpdateWithoutClaimsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutClaimsBuilderInput = {
@@ -1027,6 +1152,7 @@ export type UserCreateWithoutReviewedInput = {
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewedInput = {
@@ -1043,6 +1169,7 @@ export type UserUncheckedCreateWithoutReviewedInput = {
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewedInput = {
@@ -1064,6 +1191,7 @@ export type UserCreateWithoutApplicationsInput = {
   claimsBuilder?: Prisma.ClaimCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutApplicationsInput = {
@@ -1080,6 +1208,7 @@ export type UserUncheckedCreateWithoutApplicationsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildersInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutMembersInput
   verifications?: Prisma.MinecraftVerificationsUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutApplicationsInput = {
@@ -1112,6 +1241,7 @@ export type UserUpdateWithoutReviewedInput = {
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedInput = {
@@ -1128,6 +1258,7 @@ export type UserUncheckedUpdateWithoutReviewedInput = {
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutApplicationsInput = {
@@ -1155,6 +1286,7 @@ export type UserUpdateWithoutApplicationsInput = {
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApplicationsInput = {
@@ -1171,6 +1303,7 @@ export type UserUncheckedUpdateWithoutApplicationsInput = {
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpdateWithoutJoinedBuildTeamsInput = {
@@ -1187,6 +1320,7 @@ export type UserUpdateWithoutJoinedBuildTeamsInput = {
   permissions?: Prisma.UserPermissionUpdateManyWithoutUserNestedInput
   claimsBuilder?: Prisma.ClaimUpdateManyWithoutBuildersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJoinedBuildTeamsInput = {
@@ -1203,6 +1337,7 @@ export type UserUncheckedUpdateWithoutJoinedBuildTeamsInput = {
   permissions?: Prisma.UserPermissionUncheckedUpdateManyWithoutUserNestedInput
   claimsBuilder?: Prisma.ClaimUncheckedUpdateManyWithoutBuildersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutJoinedBuildTeamsInput = {
@@ -1228,6 +1363,7 @@ export type UserUpdateWithoutClaimsBuilderInput = {
   permissions?: Prisma.UserPermissionUpdateManyWithoutUserNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClaimsBuilderInput = {
@@ -1244,6 +1380,7 @@ export type UserUncheckedUpdateWithoutClaimsBuilderInput = {
   permissions?: Prisma.UserPermissionUncheckedUpdateManyWithoutUserNestedInput
   joinedBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutMembersNestedInput
   verifications?: Prisma.MinecraftVerificationsUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutClaimsBuilderInput = {
@@ -1269,6 +1406,7 @@ export type UserCountOutputType = {
   claimsBuilder: number
   joinedBuildTeams: number
   verifications: number
+  notifications: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1280,6 +1418,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   claimsBuilder?: boolean | UserCountOutputTypeCountClaimsBuilderArgs
   joinedBuildTeams?: boolean | UserCountOutputTypeCountJoinedBuildTeamsArgs
   verifications?: boolean | UserCountOutputTypeCountVerificationsArgs
+  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
 }
 
 /**
@@ -1348,6 +1487,13 @@ export type UserCountOutputTypeCountVerificationsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.MinecraftVerificationsWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1364,6 +1510,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   claimsBuilder?: boolean | Prisma.User$claimsBuilderArgs<ExtArgs>
   joinedBuildTeams?: boolean | Prisma.User$joinedBuildTeamsArgs<ExtArgs>
   verifications?: boolean | Prisma.User$verificationsArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1404,6 +1551,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   claimsBuilder?: boolean | Prisma.User$claimsBuilderArgs<ExtArgs>
   joinedBuildTeams?: boolean | Prisma.User$joinedBuildTeamsArgs<ExtArgs>
   verifications?: boolean | Prisma.User$verificationsArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1420,6 +1568,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     claimsBuilder: Prisma.$ClaimPayload<ExtArgs>[]
     joinedBuildTeams: Prisma.$BuildTeamPayload<ExtArgs>[]
     verifications: Prisma.$MinecraftVerificationsPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1830,6 +1979,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   claimsBuilder<T extends Prisma.User$claimsBuilderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$claimsBuilderArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClaimPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   joinedBuildTeams<T extends Prisma.User$joinedBuildTeamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$joinedBuildTeamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BuildTeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verifications<T extends Prisma.User$verificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MinecraftVerificationsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2442,6 +2592,30 @@ export type User$verificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.MinecraftVerificationsScalarFieldEnum | Prisma.MinecraftVerificationsScalarFieldEnum[]
+}
+
+/**
+ * User.notifications
+ */
+export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**
