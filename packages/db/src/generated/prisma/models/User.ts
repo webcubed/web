@@ -49,6 +49,7 @@ export type UserCountAggregateOutputType = {
   avatar: number
   username: number
   minecraft: number
+  channels: number
   _all: number
 }
 
@@ -78,6 +79,7 @@ export type UserCountAggregateInputType = {
   avatar?: true
   username?: true
   minecraft?: true
+  channels?: true
   _all?: true
 }
 
@@ -160,6 +162,7 @@ export type UserGroupByOutputType = {
   avatar: string | null
   username: string | null
   minecraft: string | null
+  channels: $Enums.NotificationChannel[]
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -190,6 +193,7 @@ export type UserWhereInput = {
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   username?: Prisma.StringNullableFilter<"User"> | string | null
   minecraft?: Prisma.StringNullableFilter<"User"> | string | null
+  channels?: Prisma.EnumNotificationChannelNullableListFilter<"User">
   reviewed?: Prisma.ApplicationListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
   createdBuildTeams?: Prisma.BuildTeamListRelationFilter
@@ -208,6 +212,7 @@ export type UserOrderByWithRelationInput = {
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrderInput | Prisma.SortOrder
   minecraft?: Prisma.SortOrderInput | Prisma.SortOrder
+  channels?: Prisma.SortOrder
   reviewed?: Prisma.ApplicationOrderByRelationAggregateInput
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
   createdBuildTeams?: Prisma.BuildTeamOrderByRelationAggregateInput
@@ -229,6 +234,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   username?: Prisma.StringNullableFilter<"User"> | string | null
   minecraft?: Prisma.StringNullableFilter<"User"> | string | null
+  channels?: Prisma.EnumNotificationChannelNullableListFilter<"User">
   reviewed?: Prisma.ApplicationListRelationFilter
   applications?: Prisma.ApplicationListRelationFilter
   createdBuildTeams?: Prisma.BuildTeamListRelationFilter
@@ -247,6 +253,7 @@ export type UserOrderByWithAggregationInput = {
   avatar?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrderInput | Prisma.SortOrder
   minecraft?: Prisma.SortOrderInput | Prisma.SortOrder
+  channels?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -262,6 +269,7 @@ export type UserScalarWhereWithAggregatesInput = {
   avatar?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   username?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   minecraft?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  channels?: Prisma.EnumNotificationChannelNullableListFilter<"User">
 }
 
 export type UserCreateInput = {
@@ -271,6 +279,7 @@ export type UserCreateInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
@@ -289,6 +298,7 @@ export type UserUncheckedCreateInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
@@ -307,6 +317,7 @@ export type UserUpdateInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
@@ -325,6 +336,7 @@ export type UserUncheckedUpdateInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
@@ -343,6 +355,7 @@ export type UserCreateManyInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
 }
 
 export type UserUpdateManyMutationInput = {
@@ -352,6 +365,7 @@ export type UserUpdateManyMutationInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -361,6 +375,15 @@ export type UserUncheckedUpdateManyInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
+}
+
+export type EnumNotificationChannelNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.NotificationChannel[] | Prisma.ListEnumNotificationChannelFieldRefInput<$PrismaModel> | null
+  has?: $Enums.NotificationChannel | Prisma.EnumNotificationChannelFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.NotificationChannel[] | Prisma.ListEnumNotificationChannelFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.NotificationChannel[] | Prisma.ListEnumNotificationChannelFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -370,6 +393,7 @@ export type UserCountOrderByAggregateInput = {
   avatar?: Prisma.SortOrder
   username?: Prisma.SortOrder
   minecraft?: Prisma.SortOrder
+  channels?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -410,12 +434,21 @@ export type UserNullableScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput | null
 }
 
+export type UserCreatechannelsInput = {
+  set: $Enums.NotificationChannel[]
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type UserUpdatechannelsInput = {
+  set?: $Enums.NotificationChannel[]
+  push?: $Enums.NotificationChannel | $Enums.NotificationChannel[]
 }
 
 export type UserCreateNestedOneWithoutNotificationsInput = {
@@ -603,6 +636,7 @@ export type UserCreateWithoutNotificationsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
@@ -620,6 +654,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
@@ -653,6 +688,7 @@ export type UserUpdateWithoutNotificationsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
@@ -670,6 +706,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
@@ -687,6 +724,7 @@ export type UserCreateWithoutCreatedBuildTeamsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   claims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
@@ -704,6 +742,7 @@ export type UserUncheckedCreateWithoutCreatedBuildTeamsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
@@ -726,6 +765,7 @@ export type UserCreateWithoutJoinedBuildTeamsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
@@ -743,6 +783,7 @@ export type UserUncheckedCreateWithoutJoinedBuildTeamsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
@@ -776,6 +817,7 @@ export type UserUpdateWithoutCreatedBuildTeamsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
@@ -793,6 +835,7 @@ export type UserUncheckedUpdateWithoutCreatedBuildTeamsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
@@ -829,6 +872,7 @@ export type UserScalarWhereInput = {
   avatar?: Prisma.StringNullableFilter<"User"> | string | null
   username?: Prisma.StringNullableFilter<"User"> | string | null
   minecraft?: Prisma.StringNullableFilter<"User"> | string | null
+  channels?: Prisma.EnumNotificationChannelNullableListFilter<"User">
 }
 
 export type UserCreateWithoutPermissionsInput = {
@@ -838,6 +882,7 @@ export type UserCreateWithoutPermissionsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
@@ -855,6 +900,7 @@ export type UserUncheckedCreateWithoutPermissionsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
@@ -888,6 +934,7 @@ export type UserUpdateWithoutPermissionsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
@@ -905,6 +952,7 @@ export type UserUncheckedUpdateWithoutPermissionsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
@@ -922,6 +970,7 @@ export type UserCreateWithoutVerificationsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
@@ -939,6 +988,7 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
@@ -972,6 +1022,7 @@ export type UserUpdateWithoutVerificationsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
@@ -989,6 +1040,7 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1006,6 +1058,7 @@ export type UserCreateWithoutClaimsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
@@ -1023,6 +1076,7 @@ export type UserUncheckedCreateWithoutClaimsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
@@ -1045,6 +1099,7 @@ export type UserCreateWithoutClaimsBuilderInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
@@ -1062,6 +1117,7 @@ export type UserUncheckedCreateWithoutClaimsBuilderInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
@@ -1095,6 +1151,7 @@ export type UserUpdateWithoutClaimsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
@@ -1112,6 +1169,7 @@ export type UserUncheckedUpdateWithoutClaimsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1145,6 +1203,7 @@ export type UserCreateWithoutReviewedInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
   claims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
@@ -1162,6 +1221,7 @@ export type UserUncheckedCreateWithoutReviewedInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
@@ -1184,6 +1244,7 @@ export type UserCreateWithoutApplicationsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationCreateNestedManyWithoutReviewerInput
   createdBuildTeams?: Prisma.BuildTeamCreateNestedManyWithoutCreatorInput
   claims?: Prisma.ClaimCreateNestedManyWithoutOwnerInput
@@ -1201,6 +1262,7 @@ export type UserUncheckedCreateWithoutApplicationsInput = {
   avatar?: string | null
   username?: string | null
   minecraft?: string | null
+  channels?: Prisma.UserCreatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedCreateNestedManyWithoutReviewerInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedCreateNestedManyWithoutCreatorInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutOwnerInput
@@ -1234,6 +1296,7 @@ export type UserUpdateWithoutReviewedInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
@@ -1251,6 +1314,7 @@ export type UserUncheckedUpdateWithoutReviewedInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1279,6 +1343,7 @@ export type UserUpdateWithoutApplicationsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutOwnerNestedInput
@@ -1296,6 +1361,7 @@ export type UserUncheckedUpdateWithoutApplicationsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1313,6 +1379,7 @@ export type UserUpdateWithoutJoinedBuildTeamsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
@@ -1330,6 +1397,7 @@ export type UserUncheckedUpdateWithoutJoinedBuildTeamsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1347,6 +1415,7 @@ export type UserUncheckedUpdateManyWithoutJoinedBuildTeamsInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
 }
 
 export type UserUpdateWithoutClaimsBuilderInput = {
@@ -1356,6 +1425,7 @@ export type UserUpdateWithoutClaimsBuilderInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUpdateManyWithoutCreatorNestedInput
@@ -1373,6 +1443,7 @@ export type UserUncheckedUpdateWithoutClaimsBuilderInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
   reviewed?: Prisma.ApplicationUncheckedUpdateManyWithoutReviewerNestedInput
   applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
   createdBuildTeams?: Prisma.BuildTeamUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1390,6 +1461,7 @@ export type UserUncheckedUpdateManyWithoutClaimsBuilderInput = {
   avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   minecraft?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  channels?: Prisma.UserUpdatechannelsInput | $Enums.NotificationChannel[]
 }
 
 
@@ -1502,6 +1574,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   avatar?: boolean
   username?: boolean
   minecraft?: boolean
+  channels?: boolean
   reviewed?: boolean | Prisma.User$reviewedArgs<ExtArgs>
   applications?: boolean | Prisma.User$applicationsArgs<ExtArgs>
   createdBuildTeams?: boolean | Prisma.User$createdBuildTeamsArgs<ExtArgs>
@@ -1521,6 +1594,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatar?: boolean
   username?: boolean
   minecraft?: boolean
+  channels?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1530,6 +1604,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatar?: boolean
   username?: boolean
   minecraft?: boolean
+  channels?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1539,9 +1614,10 @@ export type UserSelectScalar = {
   avatar?: boolean
   username?: boolean
   minecraft?: boolean
+  channels?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ssoId" | "discordId" | "avatar" | "username" | "minecraft", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ssoId" | "discordId" | "avatar" | "username" | "minecraft" | "channels", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reviewed?: boolean | Prisma.User$reviewedArgs<ExtArgs>
   applications?: boolean | Prisma.User$applicationsArgs<ExtArgs>
@@ -1577,6 +1653,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     avatar: string | null
     username: string | null
     minecraft: string | null
+    channels: $Enums.NotificationChannel[]
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2015,6 +2092,7 @@ export interface UserFieldRefs {
   readonly avatar: Prisma.FieldRef<"User", 'String'>
   readonly username: Prisma.FieldRef<"User", 'String'>
   readonly minecraft: Prisma.FieldRef<"User", 'String'>
+  readonly channels: Prisma.FieldRef<"User", 'NotificationChannel[]'>
 }
     
 

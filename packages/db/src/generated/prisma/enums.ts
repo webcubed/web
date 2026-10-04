@@ -9,6 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
+export const NotificationChannel = {
+  DISCORD: 'DISCORD',
+  EMAIL: 'EMAIL'
+} as const
+
+export type NotificationChannel = (typeof NotificationChannel)[keyof typeof NotificationChannel]
+
+
 export const ApplicationStatus = {
   SEND: 'SEND',
   REVIEWING: 'REVIEWING',
