@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { ERROR_GENERIC, ERROR_VALIDATION } from '../util/Errors.js'
 import { FrontendRoutesGroups, rerenderFrontend } from '../util/Frontend.js'
 
-import { ApplicationQuestionType } from '@prisma/client'
+import { ApplicationQuestionType } from '@repo/db'
 import crypto from 'crypto'
 import { validationResult } from 'express-validator'
 import yup from 'yup'
@@ -103,6 +103,7 @@ class BuildTeamController {
 				ip: true,
 				version: true,
 				invite: true,
+				supportsBedrock: true,
 			},
 		})
 
@@ -113,6 +114,7 @@ class BuildTeamController {
 				ip: b.ip ? b.ip.split(';').map((ip) => ip.trim()) : [],
 				version: b.version,
 				invite: b.invite,
+				supportsBedrock: b.supportsBedrock,
 			}
 			return acc
 		}, {})
@@ -163,6 +165,7 @@ class BuildTeamController {
 				ip: true,
 				version: true,
 				invite: true,
+				supportsBedrock: true,
 			},
 		})
 
@@ -392,6 +395,7 @@ class BuildTeamController {
 			ip,
 			version,
 			color,
+			supportsBedrock,
 		} = req.body
 		const buildteam = await this.core.getPrisma().buildTeam.update({
 			where: req.query.slug ? { slug: req.params.id } : { id: req.params.id },
@@ -414,6 +418,7 @@ class BuildTeamController {
 				version,
 				ip,
 				color,
+				supportsBedrock,
 			},
 		})
 

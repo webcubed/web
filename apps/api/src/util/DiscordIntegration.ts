@@ -1,4 +1,4 @@
-import { Claim } from '@prisma/client'
+import { Claim } from '@repo/db'
 import Core from '../Core.js'
 
 class DiscordIntegration {
@@ -152,7 +152,7 @@ class DiscordIntegration {
 			embeds: [
 				{
 					title: application.id.split('-')[0] + ' - ' + application.buildteam.name,
-					url: process.env.FRONTEND_URL + `/teams/${application.buildteam.id}/manage/review/${application.id}`,
+					url: `https://my.buildtheearth.net/team/${application.buildteam.slug}/applications/${application.id}`,
 					color: discordWebhookType.application.color,
 					fields: [
 						{

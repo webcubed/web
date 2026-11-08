@@ -1,11 +1,13 @@
 'use client'
 import { addApplicationResponseTemplate, reviewApplication } from '@/actions/buildTeams'
+import { ACTION_COLORS } from '@/util/actions'
 import {
 	ActionIcon,
 	Button,
 	ButtonGroup,
 	Group,
 	Menu,
+	MenuDivider,
 	MenuDropdown,
 	MenuItem,
 	MenuTarget,
@@ -19,20 +21,19 @@ import { openConfirmModal } from '@mantine/modals'
 import { showNotification } from '@mantine/notifications'
 import { RichTextEditor, useRichTextEditorContext } from '@mantine/tiptap'
 import type { Application, ApplicationResponseTemplate, ApplicationStatus } from '@repo/db'
-import { IconCheck, IconDots, IconId, IconTemplate, IconX } from '@tabler/icons-react'
+import { IconCheck, IconDots, IconExternalLink, IconId, IconTemplate, IconX } from '@tabler/icons-react'
 import Highlight from '@tiptap/extension-highlight'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import SubScript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import TextAlign from '@tiptap/extension-text-align'
-import Underline from '@tiptap/extension-underline'
 import { useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Fragment } from 'react'
 import { Markdown } from 'tiptap-markdown'
 
-export function EditMenu({ application }: { application: Application }) {
+export function EditMenu({ application }: { application: Application; slug?: string }) {
 	const clipboard = useClipboard({ timeout: 500 })
 
 	return (
@@ -50,6 +51,15 @@ export function EditMenu({ application }: { application: Application }) {
 				>
 					Copy ID
 				</MenuItem>
+				{application.userId && (
+					<MenuItem
+						leftSection={<IconId style={{ width: rem(14), height: rem(14) }} />}
+						aria-label="Copy SSO ID"
+						onClick={() => clipboard.copy(application.userId)}
+					>
+						Copy SSO ID
+					</MenuItem>
+				)}
 			</MenuDropdown>
 		</Menu>
 	)
@@ -66,13 +76,12 @@ export function ResponseEditor({
 	userId: string
 	buildTeamSlug: string
 }) {
-	const APPLICATION_STATUS_ACCEPTED: ApplicationStatus = 'ACCEPTED'
+	const APPLICATION_STATUS_ACCEPTED: ApplicationStatus = application.trial ? 'TRIAL' : 'ACCEPTED'
 	const APPLICATION_STATUS_DECLINED: ApplicationStatus = 'DECLINED'
 
 	const responseEditor = useEditor({
 		extensions: [
-			StarterKit,
-			Underline,
+			StarterKit.configure({ link: false }),
 			Link,
 			Superscript,
 			SubScript,
@@ -82,6 +91,7 @@ export function ResponseEditor({
 			Markdown,
 		],
 		immediatelyRender: false,
+		shouldRerenderOnTransaction: true,
 	})
 
 	return (
@@ -130,11 +140,13 @@ export function ResponseEditor({
 							reviewApplication({
 								buildTeamSlug,
 								applicationId: application.id,
-								reason: responseEditor?.storage.markdown.getMarkdown(),
+								reason: (responseEditor?.storage as any)?.markdown.getMarkdown(),
 								status: APPLICATION_STATUS_ACCEPTED,
 							}).then(() => {
 								showNotification({
-									message: `Application accepted successfully.`,
+									message: application.trial
+										? `Trial application accepted successfully.`
+										: `Application accepted successfully.`,
 									title: 'Application Reviewed',
 									color: 'green',
 								})
@@ -142,7 +154,7 @@ export function ResponseEditor({
 						}
 						color="green"
 					>
-						Accept
+						{application.trial ? 'Accept as Trial' : 'Accept'}
 					</Button>
 					<Button
 						leftSection={<IconX />}
@@ -150,7 +162,7 @@ export function ResponseEditor({
 							reviewApplication({
 								buildTeamSlug,
 								applicationId: application.id,
-								reason: responseEditor?.storage.markdown.getMarkdown(),
+								reason: (responseEditor?.storage as any)?.markdown.getMarkdown(),
 								status: APPLICATION_STATUS_DECLINED,
 							}).then(() => {
 								showNotification({

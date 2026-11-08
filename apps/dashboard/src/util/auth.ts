@@ -134,7 +134,33 @@ export const authOptions: AuthOptions = {
 			}
 		},
 
-		jwt: async ({ token, account, user }) => {
+		jwt: async ({ token, account, user, trigger }) => {
+			// Never trust client-supplied values from useSession().update(); refresh from the database instead
+			if (trigger === 'update' && token.sub && typeof window === 'undefined') {
+				try {
+					const { default: prisma } = await import('./db')
+					const dbUser = await prisma.user.findFirst({
+						where: { ssoId: token.sub },
+						select: { username: true, minecraft: true, onboardingCompletedAt: true, onboardingDismissed: true },
+					})
+					if (dbUser) {
+						if (token.user && dbUser.username) {
+							;(token.user as any).username = dbUser.username
+						}
+						if ((dbUser.minecraft ?? null) !== (token.minecraft ?? null)) {
+							token.minecraftVerified = false
+						}
+						token.minecraft = dbUser.minecraft
+						token.onboardingCompletedAt = dbUser.onboardingCompletedAt
+							? dbUser.onboardingCompletedAt.toISOString()
+							: null
+						token.onboardingDismissed = dbUser.onboardingDismissed ?? false
+					}
+				} catch (error) {
+					console.error('Failed to refresh token from database on session update:', error)
+				}
+			}
+
 			// Initial sign in
 			if (account && user) {
 				// Add access_token, refresh_token and expirations to the token right after signin
@@ -150,7 +176,51 @@ export const authOptions: AuthOptions = {
 				token.refreshTokenExpired = refreshExpiresIn ? Date.now() + (refreshExpiresIn - 15) * 1000 : undefined
 				token.sessionId = account.session_state
 				token.user = user
+
+				// Automatically ensure user database record and permissions exist upon initial authentication
+				if (typeof window === 'undefined') {
+					try {
+						const { ensureUserRecord } = await import('./ensureUser')
+						const result = await ensureUserRecord({
+							ssoId: user.id,
+							username: (user as any).username,
+						})
+						token.userEnsured = true
+						token.minecraft = result.user.minecraft
+						token.onboardingCompletedAt = result.user.onboardingCompletedAt
+							? result.user.onboardingCompletedAt.toISOString()
+							: null
+						token.onboardingDismissed = result.user.onboardingDismissed ?? false
+					} catch (error) {
+						console.error('Failed to ensure user record during jwt callback:', error)
+					}
+				}
+
 				return token
+			}
+
+			// If token was not marked as ensured yet, or onboarding status is missing, ensure it and persist in token
+			if (
+				(!token.userEnsured || token.onboardingDismissed === undefined || token.minecraft === undefined) &&
+				token.sub
+			) {
+				if (typeof window === 'undefined') {
+					try {
+						const { ensureUserRecord } = await import('./ensureUser')
+						const result = await ensureUserRecord({
+							ssoId: token.sub,
+							username: (token.user as any)?.username,
+						})
+						token.userEnsured = true
+						token.minecraft = result.user.minecraft
+						token.onboardingCompletedAt = result.user.onboardingCompletedAt
+							? result.user.onboardingCompletedAt.toISOString()
+							: null
+						token.onboardingDismissed = result.user.onboardingDismissed ?? false
+					} catch (error) {
+						console.error('Failed to ensure user record for existing token:', error)
+					}
+				}
 			}
 
 			// If token already has an error (from previous check), return it immediately
@@ -184,7 +254,22 @@ export const authOptions: AuthOptions = {
 				}
 
 				// @ts-expect-error shut up typescript
-				session.user = token.user
+				session.user = {
+					...token.user,
+					minecraft: token.minecraft ?? (token.user as any)?.minecraft ?? null,
+					minecraftVerified:
+						token.minecraftVerified ??
+						(token.user as any)?.minecraftVerified ??
+						(token.user as any)?.minecraft_verified ??
+						false,
+					minecraft_verified:
+						token.minecraftVerified ??
+						(token.user as any)?.minecraftVerified ??
+						(token.user as any)?.minecraft_verified ??
+						false,
+					onboardingCompletedAt: token.onboardingCompletedAt,
+					onboardingDismissed: token.onboardingDismissed,
+				}
 				session.error = token.error
 				session.accessToken = token.accessToken
 			}

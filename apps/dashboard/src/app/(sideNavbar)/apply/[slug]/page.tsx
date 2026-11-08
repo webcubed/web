@@ -8,24 +8,38 @@ import {
 	Box,
 	Divider,
 	Group,
+	Stack,
 	Text,
 	Title,
 } from '@mantine/core'
 
 import { applyToBuildTeam } from '@/actions/buildTeams'
+import { ensureUserCreated, getUserFederatedIdentities } from '@/actions/getUser'
 import { ApplyForm } from '@/app/(sideNavbar)/apply/[slug]/interactivity'
 import Anchor from '@/components/core/Anchor'
 import { TextCard } from '@/components/core/card/TextCard'
 import ContentWrapper from '@/components/core/ContentWrapper'
 import ErrorDisplay from '@/components/core/ErrorDisplay'
+import LinkButton from '@/components/core/LinkButton'
 import { Greeting } from '@/components/data/Greeting'
 import { getSession } from '@/util/auth'
 import { getCountryNames } from '@/util/countries'
 import { toHumanDate } from '@/util/date'
 import prisma from '@/util/db'
 import { ApplicationStatus } from '@repo/db'
-import { IconArrowForward, IconCheck, IconClock, IconConfetti, IconX } from '@tabler/icons-react'
+import {
+	IconAlertTriangle,
+	IconArrowForward,
+	IconBrandDiscord,
+	IconCheck,
+	IconChevronRight,
+	IconClock,
+	IconConfetti,
+	IconX,
+} from '@tabler/icons-react'
+import { createHash, randomUUID } from 'crypto'
 import { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
 	const { slug } = await params
 	const team = await prisma.buildTeam.findUnique({
@@ -46,9 +60,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 	}
 }
 
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+export default async function Page({
+	params,
+	searchParams,
+}: {
+	params: Promise<{ slug: string }>
+	searchParams: Promise<{ trial?: string }>
+}) {
 	const session = await getSession()
+	if (!session) {
+		redirect('/auth/signin')
+	}
 	const slug = (await params).slug
+	const initialTrial = (await searchParams).trial === 'true'
+
+	await ensureUserCreated()
+
 	const joiningBuildTeam = await prisma.buildTeam.findUnique({
 		where: {
 			slug,
@@ -61,14 +88,15 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 			invite: true,
 			color: true,
 			allowApplications: true,
+			allowTrial: true,
 			applicationQuestions: {
-				where: { sort: { gt: 0 } },
+				where: { sort: { gte: 0 } },
 			},
 		},
 	})
 	const user = await prisma.user.findUnique({
 		where: {
-			ssoId: session?.user.id,
+			ssoId: session.user.id,
 		},
 		include: {
 			_count: {
@@ -100,7 +128,33 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 		throw Error('User not found')
 	}
 
-	const applyToBuildTeamBinded = applyToBuildTeam.bind(null, { userId: session?.user.id || '', buildTeamSlug: slug })
+	let federatedIdentities: any[] = []
+	try {
+		federatedIdentities = await getUserFederatedIdentities(session.user.id)
+	} catch (e) {
+		console.warn('Could not fetch federated identities on apply page:', e)
+	}
+	const discordIdentity = federatedIdentities.find((fi: any) => fi.identityProvider === 'discord')
+	const isDiscordLinked = !!(user.discordId || discordIdentity?.userId)
+
+	const generateDiscordLinkUrl = () => {
+		const baseUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || ''
+		const clientId = process.env.NEXT_PUBLIC_KEYCLOAK_ID || ''
+		const appUrl = process.env.NEXTAUTH_URL || ''
+		const redirectUri = `${appUrl}/apply/${slug}`
+		const nonce = randomUUID()
+		const sessionState = session.user.sid || session.user.session_state || ''
+		const hash = createHash('sha256')
+			.update(nonce + sessionState + clientId + 'discord')
+			.digest('base64url')
+
+		return `${baseUrl}/broker/discord/link?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+			redirectUri,
+		)}&nonce=${nonce}&hash=${hash}`
+	}
+	const discordLinkUrl = generateDiscordLinkUrl()
+
+	const applyToBuildTeamBinded = applyToBuildTeam.bind(null, { userId: session.user.id, buildTeamSlug: slug })
 
 	if (user?.applications.length > 0) {
 		const latestApplication = user.applications[0]
@@ -153,6 +207,31 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 			</Text>
 
 			<Box maw={{ base: '100%', sm: '85%', md: '60%', xl: '45%' }} mt="md">
+				{!isDiscordLinked && (
+					<Alert
+						variant="light"
+						color="orange"
+						title="Discord Connection Required"
+						mb="md"
+						icon={<IconAlertTriangle size={16} />}
+					>
+						<Stack gap="sm" align="flex-start">
+							<Text size="sm">
+								You have not connected your Discord account yet. Connecting your Discord account is mandatory before you
+								can apply to {joiningBuildTeam?.name}. It enables application review notifications and automated builder
+								role assignment.
+							</Text>
+							<LinkButton
+								href={discordLinkUrl}
+								color="indigo"
+								leftSection={<IconBrandDiscord size={18} />}
+								rightSection={<IconChevronRight size={16} />}
+							>
+								Connect Discord Account
+							</LinkButton>
+						</Stack>
+					</Alert>
+				)}
 				{user.applications.length > 0 && user.applications[0].status === ApplicationStatus.DECLINED && (
 					<Alert
 						variant="light"
@@ -165,6 +244,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 						{user.applications[0].reviewedAt ? toHumanDate(user.applications[0].reviewedAt) : 'unknown date'}.
 						Don&apos;t worry though! You should have received feedback from the Build Team in your Discord DMs. Please
 						check them out to see how you can improve and re-apply below.
+					</Alert>
+				)}
+				{user.applications.length > 0 && user.applications[0].status === ApplicationStatus.TRIAL && (
+					<Alert variant="light" color="blue" title="Trial builder" mb="md" icon={<IconClock size={16} />}>
+						Your trial application to {joiningBuildTeam?.name} was accepted on{' '}
+						{user.applications[0].reviewedAt ? toHumanDate(user.applications[0].reviewedAt) : 'unknown date'}. You
+						should have received a message from the Build Team in your Discord DMs. Once you are ready, you can apply as
+						a full builder below.
 					</Alert>
 				)}
 				{user.applications.length > 0 && user.applications[0].status === ApplicationStatus.SEND && (
@@ -280,6 +367,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 						color="yellow"
 						title="Applications are currently disabled for this Build Team"
 						icon={<IconClock size={16} />}
+						mb="md"
 					>
 						Unfortunately, {joiningBuildTeam.name} is not accepting new applications using this form at the moment. This
 						can be due to various reasons, such as the Build Team using a different system or it going through a
@@ -287,11 +375,45 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 					</Alert>
 				)}
 
+				{!isDiscordLinked && (
+					<Alert
+						variant="light"
+						color="orange"
+						title="Discord Connection Required"
+						icon={<IconAlertTriangle size={16} />}
+						mb="md"
+					>
+						<Stack gap="sm" align="flex-start">
+							<Text size="sm">
+								Application submission is locked because your Discord account is not connected. Linking Discord is
+								mandatory before you can submit an application to {joiningBuildTeam.name}. You also need to be a member
+								of the BuildTheEarth.net{' '}
+								<Anchor href="https://go.buildtheearth.net/dc" target="_blank" fz="sm">
+									Discord server
+								</Anchor>
+								.
+							</Text>
+							<LinkButton
+								href={discordLinkUrl}
+								color="indigo"
+								leftSection={<IconBrandDiscord size={18} />}
+								rightSection={<IconChevronRight size={16} />}
+							>
+								Connect Discord Account
+							</LinkButton>
+						</Stack>
+					</Alert>
+				)}
+
 				<ApplyForm
 					applyAction={applyToBuildTeamBinded}
 					questions={joiningBuildTeam.applicationQuestions.sort((a, b) => a.sort - b.sort)}
+					allowTrial={joiningBuildTeam.allowTrial}
+					initialTrial={initialTrial}
 					allowApplications={
-						joiningBuildTeam.allowApplications! && user.applications[0]?.status !== ApplicationStatus.SEND
+						Boolean(joiningBuildTeam.allowApplications) &&
+						user.applications[0]?.status !== ApplicationStatus.SEND &&
+						isDiscordLinked
 					}
 				/>
 			</Box>

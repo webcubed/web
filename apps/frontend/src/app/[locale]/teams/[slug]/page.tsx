@@ -5,8 +5,9 @@ import LinkButton from '@/components/core/LinkButton'
 import Link from '@/components/core/Link'
 import { getCountryNames } from '@/util/countries'
 import prisma from '@/util/db'
-import { getLanguageAlternates } from '@/util/seo'
+import { getLanguageAlternates, getLocalizedUrl } from '@/util/seo'
 import {
+	ActionIcon,
 	Avatar,
 	Badge,
 	Box,
@@ -23,11 +24,21 @@ import {
 	Text,
 	Title,
 } from '@mantine/core'
-import { IconAddressBook, IconBrandMinecraft, IconChevronRight, IconMap, IconUsers } from '@tabler/icons-react'
+import {
+	IconAddressBook,
+	IconBrandDiscord,
+	IconBrandDiscordFilled,
+	IconBrandMinecraft,
+	IconChevronRight,
+	IconMap,
+	IconUsers,
+} from '@tabler/icons-react'
 import { Metadata } from 'next'
 import { Locale } from 'next-intl'
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server'
 import JoinServerGuide from './interactivity'
+import { CustomSocialIcon } from '@/components/data/CustomSocialIcon'
+import { SafeHtml } from '@repo/shared'
 
 export async function generateMetadata({
 	params,
@@ -47,14 +58,20 @@ export async function generateMetadata({
 		return {
 			title: t('notFoundTitle'),
 			description: t('notFoundDescription'),
-			alternates: { languages: getLanguageAlternates(`/teams/${slug}`) },
+			alternates: {
+				canonical: getLocalizedUrl(locale, `/teams/${slug}`),
+				languages: getLanguageAlternates(`/teams/${slug}`),
+			},
 		}
 	}
 
 	return {
 		title: buildTeam.name,
 		description: buildTeam.about,
-		alternates: { languages: getLanguageAlternates(`/teams/${slug}`) },
+		alternates: {
+			canonical: getLocalizedUrl(locale, `/teams/${slug}`),
+			languages: getLanguageAlternates(`/teams/${slug}`),
+		},
 		openGraph: { images: [buildTeam.backgroundImage || t('defaultOgImage')] },
 	}
 }
@@ -69,6 +86,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 	setRequestLocale(locale)
 	const t = await getTranslations('teams.ownPage')
 	const format = await getFormatter()
+	const dashboardUrl = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://my.buildtheearth.net').replace(/\/$/, '')
 
 	const buildTeam = await prisma.buildTeam.findUnique({
 		where: { slug: (await params).slug },
@@ -78,12 +96,14 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 			backgroundImage: true,
 			icon: true,
 			ip: true,
+			invite: true,
 			version: true,
 			location: true,
 			slug: true,
 			color: true,
 			_count: { select: { members: true, claims: true } },
 			showcases: { take: 2, include: { image: { select: { name: true, src: true } } } },
+			socials: { select: { icon: true, url: true, name: true, id: true } },
 		},
 	})
 	if (!buildTeam)
@@ -135,15 +155,36 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 						></Avatar>
 						<h1>{buildTeam.name}</h1>
 					</Group>
-					{/* TODO: replace URL */}
-					<LinkButton
-						href={`https://beta.buildtheearth.net/teams/${buildTeam.slug}/apply`}
-						w={{ base: '100%', md: 'auto' }}
-						maw="none"
-						mb={{ base: 'xl', md: 0 }}
-					>
-						{t('apply')}
-					</LinkButton>
+					<Group>
+						{[...buildTeam.socials, { name: 'discord', id: 'discord', icon: 'discord', url: buildTeam.invite }]
+							.filter((social) => Boolean(social.url))
+							.sort((a, b) => a.name.localeCompare(b.name))
+							.map((social) => (
+								<ActionIcon
+									key={social.id}
+									component={Link}
+									href={social.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									size="lg"
+									variant="subtle"
+									color={buildTeam.color}
+									radius="sm"
+								>
+									<CustomSocialIcon icon={social.icon} style={{ width: '70%', height: '70%' }} />
+								</ActionIcon>
+							))}
+						<LinkButton
+							href={`${dashboardUrl}/apply/${buildTeam.slug}?team=${buildTeam.slug}`}
+							w={{ base: '100%', md: 'auto' }}
+							maw="none"
+							mb={{ base: 'xl', md: 0 }}
+							data-umami-event="team-apply-click"
+							data-umami-event-url={`${dashboardUrl}/apply/${buildTeam.slug}?team=${buildTeam.slug}`}
+						>
+							{t('apply')}
+						</LinkButton>
+					</Group>
 				</Flex>
 			</Group>
 			<Container
@@ -157,7 +198,9 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 						<Box>
 							<Title order={2}>{t('overview')}</Title>
 							<div className="heading-underline" style={{ marginBottom: 'var(--mantine-spacing-lg)' }} />
-							<Box maw={{ base: '100%', xs: '90%' }} dangerouslySetInnerHTML={{ __html: buildTeam.about }} />
+							<Box maw={{ base: '100%', xs: '90%' }}>
+								<SafeHtml html={buildTeam.about} />
+							</Box>
 						</Box>
 					</GridCol>
 					<GridCol span={{ xl: 4 }} offset={{ xl: 2 }} style={{ position: 'relative' }}>
@@ -192,6 +235,30 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 										<IconChevronRight size={20} stroke={2} color="var(--mantine-color-indigo-4)" />
 									</Flex>
 								</Group>
+								{buildTeam.invite ? (
+									<>
+										<Divider style={{ margin: '0' }} my="xs" />
+										<Group justify="space-between">
+											<Flex align="center" gap="sm" py="xs">
+												<IconBrandDiscord size={20} />
+												<Text c="dimmed">{t('discord')}</Text>
+											</Flex>
+											<Flex
+												align="center"
+												gap={1}
+												py="xs"
+												style={{ cursor: 'pointer', textDecoration: 'none' }}
+												component={Link}
+												href={buildTeam.invite}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												<Text c="indigo">.gg/{buildTeam.invite.split('/').filter(Boolean).pop()} </Text>
+												<IconChevronRight size={20} stroke={2} color="var(--mantine-color-indigo-4)" />
+											</Flex>
+										</Group>
+									</>
+								) : null}
 								<Divider style={{ margin: '0' }} my="xs" />
 								<Group justify="space-between">
 									<Flex align="center" gap="sm" py="xs">

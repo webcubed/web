@@ -47,6 +47,7 @@ export type BuildTeamMinAggregateOutputType = {
   webhook: string | null
   allowApplications: boolean | null
   color: string | null
+  supportsBedrock: boolean | null
 }
 
 export type BuildTeamMaxAggregateOutputType = {
@@ -72,6 +73,7 @@ export type BuildTeamMaxAggregateOutputType = {
   webhook: string | null
   allowApplications: boolean | null
   color: string | null
+  supportsBedrock: boolean | null
 }
 
 export type BuildTeamCountAggregateOutputType = {
@@ -97,6 +99,7 @@ export type BuildTeamCountAggregateOutputType = {
   webhook: number
   allowApplications: number
   color: number
+  supportsBedrock: number
   _all: number
 }
 
@@ -124,6 +127,7 @@ export type BuildTeamMinAggregateInputType = {
   webhook?: true
   allowApplications?: true
   color?: true
+  supportsBedrock?: true
 }
 
 export type BuildTeamMaxAggregateInputType = {
@@ -149,6 +153,7 @@ export type BuildTeamMaxAggregateInputType = {
   webhook?: true
   allowApplications?: true
   color?: true
+  supportsBedrock?: true
 }
 
 export type BuildTeamCountAggregateInputType = {
@@ -174,6 +179,7 @@ export type BuildTeamCountAggregateInputType = {
   webhook?: true
   allowApplications?: true
   color?: true
+  supportsBedrock?: true
   _all?: true
 }
 
@@ -272,6 +278,7 @@ export type BuildTeamGroupByOutputType = {
   webhook: string | null
   allowApplications: boolean | null
   color: string
+  supportsBedrock: boolean | null
   _count: BuildTeamCountAggregateOutputType | null
   _min: BuildTeamMinAggregateOutputType | null
   _max: BuildTeamMaxAggregateOutputType | null
@@ -318,6 +325,7 @@ export type BuildTeamWhereInput = {
   webhook?: Prisma.StringNullableFilter<"BuildTeam"> | string | null
   allowApplications?: Prisma.BoolNullableFilter<"BuildTeam"> | boolean | null
   color?: Prisma.StringFilter<"BuildTeam"> | string
+  supportsBedrock?: Prisma.BoolNullableFilter<"BuildTeam"> | boolean | null
   Application?: Prisma.ApplicationListRelationFilter
   applicationQuestions?: Prisma.ApplicationQuestionListRelationFilter
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -326,7 +334,6 @@ export type BuildTeamWhereInput = {
   socials?: Prisma.SocialListRelationFilter
   UserPermission?: Prisma.UserPermissionListRelationFilter
   members?: Prisma.UserListRelationFilter
-  CalendarEvent?: Prisma.CalendarEventListRelationFilter
   responseTemplate?: Prisma.ApplicationResponseTemplateListRelationFilter
 }
 
@@ -353,6 +360,7 @@ export type BuildTeamOrderByWithRelationInput = {
   webhook?: Prisma.SortOrderInput | Prisma.SortOrder
   allowApplications?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrder
+  supportsBedrock?: Prisma.SortOrderInput | Prisma.SortOrder
   Application?: Prisma.ApplicationOrderByRelationAggregateInput
   applicationQuestions?: Prisma.ApplicationQuestionOrderByRelationAggregateInput
   creator?: Prisma.UserOrderByWithRelationInput
@@ -361,7 +369,6 @@ export type BuildTeamOrderByWithRelationInput = {
   socials?: Prisma.SocialOrderByRelationAggregateInput
   UserPermission?: Prisma.UserPermissionOrderByRelationAggregateInput
   members?: Prisma.UserOrderByRelationAggregateInput
-  CalendarEvent?: Prisma.CalendarEventOrderByRelationAggregateInput
   responseTemplate?: Prisma.ApplicationResponseTemplateOrderByRelationAggregateInput
 }
 
@@ -391,6 +398,7 @@ export type BuildTeamWhereUniqueInput = Prisma.AtLeast<{
   webhook?: Prisma.StringNullableFilter<"BuildTeam"> | string | null
   allowApplications?: Prisma.BoolNullableFilter<"BuildTeam"> | boolean | null
   color?: Prisma.StringFilter<"BuildTeam"> | string
+  supportsBedrock?: Prisma.BoolNullableFilter<"BuildTeam"> | boolean | null
   Application?: Prisma.ApplicationListRelationFilter
   applicationQuestions?: Prisma.ApplicationQuestionListRelationFilter
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -399,7 +407,6 @@ export type BuildTeamWhereUniqueInput = Prisma.AtLeast<{
   socials?: Prisma.SocialListRelationFilter
   UserPermission?: Prisma.UserPermissionListRelationFilter
   members?: Prisma.UserListRelationFilter
-  CalendarEvent?: Prisma.CalendarEventListRelationFilter
   responseTemplate?: Prisma.ApplicationResponseTemplateListRelationFilter
 }, "id" | "name" | "slug">
 
@@ -426,6 +433,7 @@ export type BuildTeamOrderByWithAggregationInput = {
   webhook?: Prisma.SortOrderInput | Prisma.SortOrder
   allowApplications?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrder
+  supportsBedrock?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.BuildTeamCountOrderByAggregateInput
   _max?: Prisma.BuildTeamMaxOrderByAggregateInput
   _min?: Prisma.BuildTeamMinOrderByAggregateInput
@@ -457,6 +465,7 @@ export type BuildTeamScalarWhereWithAggregatesInput = {
   webhook?: Prisma.StringNullableWithAggregatesFilter<"BuildTeam"> | string | null
   allowApplications?: Prisma.BoolNullableWithAggregatesFilter<"BuildTeam"> | boolean | null
   color?: Prisma.StringWithAggregatesFilter<"BuildTeam"> | string
+  supportsBedrock?: Prisma.BoolNullableWithAggregatesFilter<"BuildTeam"> | boolean | null
 }
 
 export type BuildTeamCreateInput = {
@@ -481,6 +490,7 @@ export type BuildTeamCreateInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
@@ -489,7 +499,6 @@ export type BuildTeamCreateInput = {
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -516,6 +525,7 @@ export type BuildTeamUncheckedCreateInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
@@ -523,7 +533,6 @@ export type BuildTeamUncheckedCreateInput = {
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -549,6 +558,7 @@ export type BuildTeamUpdateInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
@@ -557,7 +567,6 @@ export type BuildTeamUpdateInput = {
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -584,6 +593,7 @@ export type BuildTeamUncheckedUpdateInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
@@ -591,7 +601,6 @@ export type BuildTeamUncheckedUpdateInput = {
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -618,6 +627,7 @@ export type BuildTeamCreateManyInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
 }
 
 export type BuildTeamUpdateManyMutationInput = {
@@ -642,6 +652,7 @@ export type BuildTeamUpdateManyMutationInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type BuildTeamUncheckedUpdateManyInput = {
@@ -667,6 +678,7 @@ export type BuildTeamUncheckedUpdateManyInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type BuildTeamListRelationFilter = {
@@ -702,6 +714,7 @@ export type BuildTeamCountOrderByAggregateInput = {
   webhook?: Prisma.SortOrder
   allowApplications?: Prisma.SortOrder
   color?: Prisma.SortOrder
+  supportsBedrock?: Prisma.SortOrder
 }
 
 export type BuildTeamMaxOrderByAggregateInput = {
@@ -727,6 +740,7 @@ export type BuildTeamMaxOrderByAggregateInput = {
   webhook?: Prisma.SortOrder
   allowApplications?: Prisma.SortOrder
   color?: Prisma.SortOrder
+  supportsBedrock?: Prisma.SortOrder
 }
 
 export type BuildTeamMinOrderByAggregateInput = {
@@ -752,6 +766,7 @@ export type BuildTeamMinOrderByAggregateInput = {
   webhook?: Prisma.SortOrder
   allowApplications?: Prisma.SortOrder
   color?: Prisma.SortOrder
+  supportsBedrock?: Prisma.SortOrder
 }
 
 export type BuildTeamScalarRelationFilter = {
@@ -948,22 +963,6 @@ export type BuildTeamUpdateOneRequiredWithoutResponseTemplateNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BuildTeamUpdateToOneWithWhereWithoutResponseTemplateInput, Prisma.BuildTeamUpdateWithoutResponseTemplateInput>, Prisma.BuildTeamUncheckedUpdateWithoutResponseTemplateInput>
 }
 
-export type BuildTeamCreateNestedOneWithoutCalendarEventInput = {
-  create?: Prisma.XOR<Prisma.BuildTeamCreateWithoutCalendarEventInput, Prisma.BuildTeamUncheckedCreateWithoutCalendarEventInput>
-  connectOrCreate?: Prisma.BuildTeamCreateOrConnectWithoutCalendarEventInput
-  connect?: Prisma.BuildTeamWhereUniqueInput
-}
-
-export type BuildTeamUpdateOneWithoutCalendarEventNestedInput = {
-  create?: Prisma.XOR<Prisma.BuildTeamCreateWithoutCalendarEventInput, Prisma.BuildTeamUncheckedCreateWithoutCalendarEventInput>
-  connectOrCreate?: Prisma.BuildTeamCreateOrConnectWithoutCalendarEventInput
-  upsert?: Prisma.BuildTeamUpsertWithoutCalendarEventInput
-  disconnect?: Prisma.BuildTeamWhereInput | boolean
-  delete?: Prisma.BuildTeamWhereInput | boolean
-  connect?: Prisma.BuildTeamWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.BuildTeamUpdateToOneWithWhereWithoutCalendarEventInput, Prisma.BuildTeamUpdateWithoutCalendarEventInput>, Prisma.BuildTeamUncheckedUpdateWithoutCalendarEventInput>
-}
-
 export type BuildTeamCreateWithoutCreatorInput = {
   id?: string
   name: string
@@ -986,6 +985,7 @@ export type BuildTeamCreateWithoutCreatorInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimCreateNestedManyWithoutBuildTeamInput
@@ -993,7 +993,6 @@ export type BuildTeamCreateWithoutCreatorInput = {
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1019,6 +1018,7 @@ export type BuildTeamUncheckedCreateWithoutCreatorInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
@@ -1026,7 +1026,6 @@ export type BuildTeamUncheckedCreateWithoutCreatorInput = {
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1062,6 +1061,7 @@ export type BuildTeamCreateWithoutMembersInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
@@ -1069,7 +1069,6 @@ export type BuildTeamCreateWithoutMembersInput = {
   showcases?: Prisma.ShowcaseCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1096,13 +1095,13 @@ export type BuildTeamUncheckedCreateWithoutMembersInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
   showcases?: Prisma.ShowcaseUncheckedCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1153,6 +1152,7 @@ export type BuildTeamScalarWhereInput = {
   webhook?: Prisma.StringNullableFilter<"BuildTeam"> | string | null
   allowApplications?: Prisma.BoolNullableFilter<"BuildTeam"> | boolean | null
   color?: Prisma.StringFilter<"BuildTeam"> | string
+  supportsBedrock?: Prisma.BoolNullableFilter<"BuildTeam"> | boolean | null
 }
 
 export type BuildTeamUpsertWithWhereUniqueWithoutMembersInput = {
@@ -1193,6 +1193,7 @@ export type BuildTeamCreateWithoutApplicationQuestionsInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
   claims?: Prisma.ClaimCreateNestedManyWithoutBuildTeamInput
@@ -1200,7 +1201,6 @@ export type BuildTeamCreateWithoutApplicationQuestionsInput = {
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1227,13 +1227,13 @@ export type BuildTeamUncheckedCreateWithoutApplicationQuestionsInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
   showcases?: Prisma.ShowcaseUncheckedCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1275,6 +1275,7 @@ export type BuildTeamUpdateWithoutApplicationQuestionsInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutBuildTeamNestedInput
@@ -1282,7 +1283,6 @@ export type BuildTeamUpdateWithoutApplicationQuestionsInput = {
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1309,13 +1309,13 @@ export type BuildTeamUncheckedUpdateWithoutApplicationQuestionsInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
   showcases?: Prisma.ShowcaseUncheckedUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1341,6 +1341,7 @@ export type BuildTeamCreateWithoutSocialsInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
@@ -1348,7 +1349,6 @@ export type BuildTeamCreateWithoutSocialsInput = {
   showcases?: Prisma.ShowcaseCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1375,13 +1375,13 @@ export type BuildTeamUncheckedCreateWithoutSocialsInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
   showcases?: Prisma.ShowcaseUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1423,6 +1423,7 @@ export type BuildTeamUpdateWithoutSocialsInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
@@ -1430,7 +1431,6 @@ export type BuildTeamUpdateWithoutSocialsInput = {
   showcases?: Prisma.ShowcaseUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1457,13 +1457,13 @@ export type BuildTeamUncheckedUpdateWithoutSocialsInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
   showcases?: Prisma.ShowcaseUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1489,6 +1489,7 @@ export type BuildTeamCreateWithoutShowcasesInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
@@ -1496,7 +1497,6 @@ export type BuildTeamCreateWithoutShowcasesInput = {
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1523,13 +1523,13 @@ export type BuildTeamUncheckedCreateWithoutShowcasesInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1571,6 +1571,7 @@ export type BuildTeamUpdateWithoutShowcasesInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
@@ -1578,7 +1579,6 @@ export type BuildTeamUpdateWithoutShowcasesInput = {
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1605,13 +1605,13 @@ export type BuildTeamUncheckedUpdateWithoutShowcasesInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1637,6 +1637,7 @@ export type BuildTeamCreateWithoutUserPermissionInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
@@ -1644,7 +1645,6 @@ export type BuildTeamCreateWithoutUserPermissionInput = {
   showcases?: Prisma.ShowcaseCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1671,13 +1671,13 @@ export type BuildTeamUncheckedCreateWithoutUserPermissionInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
   showcases?: Prisma.ShowcaseUncheckedCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1719,6 +1719,7 @@ export type BuildTeamUpdateWithoutUserPermissionInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
@@ -1726,7 +1727,6 @@ export type BuildTeamUpdateWithoutUserPermissionInput = {
   showcases?: Prisma.ShowcaseUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1753,13 +1753,13 @@ export type BuildTeamUncheckedUpdateWithoutUserPermissionInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
   showcases?: Prisma.ShowcaseUncheckedUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1785,6 +1785,7 @@ export type BuildTeamCreateWithoutClaimsInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
@@ -1792,7 +1793,6 @@ export type BuildTeamCreateWithoutClaimsInput = {
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1819,13 +1819,13 @@ export type BuildTeamUncheckedCreateWithoutClaimsInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   showcases?: Prisma.ShowcaseUncheckedCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1867,6 +1867,7 @@ export type BuildTeamUpdateWithoutClaimsInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
@@ -1874,7 +1875,6 @@ export type BuildTeamUpdateWithoutClaimsInput = {
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1901,13 +1901,13 @@ export type BuildTeamUncheckedUpdateWithoutClaimsInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   showcases?: Prisma.ShowcaseUncheckedUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -1933,6 +1933,7 @@ export type BuildTeamCreateWithoutApplicationInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
   claims?: Prisma.ClaimCreateNestedManyWithoutBuildTeamInput
@@ -1940,7 +1941,6 @@ export type BuildTeamCreateWithoutApplicationInput = {
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
 }
 
@@ -1967,13 +1967,13 @@ export type BuildTeamUncheckedCreateWithoutApplicationInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
   showcases?: Prisma.ShowcaseUncheckedCreateNestedManyWithoutBuildTeamInput
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
 }
 
@@ -2015,6 +2015,7 @@ export type BuildTeamUpdateWithoutApplicationInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutBuildTeamNestedInput
@@ -2022,7 +2023,6 @@ export type BuildTeamUpdateWithoutApplicationInput = {
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -2049,13 +2049,13 @@ export type BuildTeamUncheckedUpdateWithoutApplicationInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
   showcases?: Prisma.ShowcaseUncheckedUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -2081,6 +2081,7 @@ export type BuildTeamCreateWithoutResponseTemplateInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
@@ -2089,7 +2090,6 @@ export type BuildTeamCreateWithoutResponseTemplateInput = {
   socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventCreateNestedManyWithoutBuildTeamInput
 }
 
 export type BuildTeamUncheckedCreateWithoutResponseTemplateInput = {
@@ -2115,6 +2115,7 @@ export type BuildTeamUncheckedCreateWithoutResponseTemplateInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
   Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
   claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
@@ -2122,7 +2123,6 @@ export type BuildTeamUncheckedCreateWithoutResponseTemplateInput = {
   socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
   UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
   members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedCreateNestedManyWithoutBuildTeamInput
 }
 
 export type BuildTeamCreateOrConnectWithoutResponseTemplateInput = {
@@ -2163,6 +2163,7 @@ export type BuildTeamUpdateWithoutResponseTemplateInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
@@ -2171,7 +2172,6 @@ export type BuildTeamUpdateWithoutResponseTemplateInput = {
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
 }
 
 export type BuildTeamUncheckedUpdateWithoutResponseTemplateInput = {
@@ -2197,6 +2197,7 @@ export type BuildTeamUncheckedUpdateWithoutResponseTemplateInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
@@ -2204,155 +2205,6 @@ export type BuildTeamUncheckedUpdateWithoutResponseTemplateInput = {
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
-}
-
-export type BuildTeamCreateWithoutCalendarEventInput = {
-  id?: string
-  name: string
-  icon: string
-  backgroundImage: string
-  invite: string
-  about: string
-  createdAt?: Date | string
-  location?: string
-  slug?: string
-  ip?: string
-  acceptionMessage?: string
-  allowTrial?: boolean
-  rejectionMessage?: string
-  trialMessage?: string
-  token?: string
-  version?: string
-  allowBuilderClaim?: boolean | null
-  instantAccept?: boolean | null
-  webhook?: string | null
-  allowApplications?: boolean | null
-  color?: string
-  Application?: Prisma.ApplicationCreateNestedManyWithoutBuildteamInput
-  applicationQuestions?: Prisma.ApplicationQuestionCreateNestedManyWithoutBuildTeamInput
-  creator: Prisma.UserCreateNestedOneWithoutCreatedBuildTeamsInput
-  claims?: Prisma.ClaimCreateNestedManyWithoutBuildTeamInput
-  showcases?: Prisma.ShowcaseCreateNestedManyWithoutBuildTeamInput
-  socials?: Prisma.SocialCreateNestedManyWithoutBuildTeamInput
-  UserPermission?: Prisma.UserPermissionCreateNestedManyWithoutBuildTeamInput
-  members?: Prisma.UserCreateNestedManyWithoutJoinedBuildTeamsInput
-  responseTemplate?: Prisma.ApplicationResponseTemplateCreateNestedManyWithoutBuildteamInput
-}
-
-export type BuildTeamUncheckedCreateWithoutCalendarEventInput = {
-  id?: string
-  name: string
-  icon: string
-  backgroundImage: string
-  invite: string
-  about: string
-  creatorId: string
-  createdAt?: Date | string
-  location?: string
-  slug?: string
-  ip?: string
-  acceptionMessage?: string
-  allowTrial?: boolean
-  rejectionMessage?: string
-  trialMessage?: string
-  token?: string
-  version?: string
-  allowBuilderClaim?: boolean | null
-  instantAccept?: boolean | null
-  webhook?: string | null
-  allowApplications?: boolean | null
-  color?: string
-  Application?: Prisma.ApplicationUncheckedCreateNestedManyWithoutBuildteamInput
-  applicationQuestions?: Prisma.ApplicationQuestionUncheckedCreateNestedManyWithoutBuildTeamInput
-  claims?: Prisma.ClaimUncheckedCreateNestedManyWithoutBuildTeamInput
-  showcases?: Prisma.ShowcaseUncheckedCreateNestedManyWithoutBuildTeamInput
-  socials?: Prisma.SocialUncheckedCreateNestedManyWithoutBuildTeamInput
-  UserPermission?: Prisma.UserPermissionUncheckedCreateNestedManyWithoutBuildTeamInput
-  members?: Prisma.UserUncheckedCreateNestedManyWithoutJoinedBuildTeamsInput
-  responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedCreateNestedManyWithoutBuildteamInput
-}
-
-export type BuildTeamCreateOrConnectWithoutCalendarEventInput = {
-  where: Prisma.BuildTeamWhereUniqueInput
-  create: Prisma.XOR<Prisma.BuildTeamCreateWithoutCalendarEventInput, Prisma.BuildTeamUncheckedCreateWithoutCalendarEventInput>
-}
-
-export type BuildTeamUpsertWithoutCalendarEventInput = {
-  update: Prisma.XOR<Prisma.BuildTeamUpdateWithoutCalendarEventInput, Prisma.BuildTeamUncheckedUpdateWithoutCalendarEventInput>
-  create: Prisma.XOR<Prisma.BuildTeamCreateWithoutCalendarEventInput, Prisma.BuildTeamUncheckedCreateWithoutCalendarEventInput>
-  where?: Prisma.BuildTeamWhereInput
-}
-
-export type BuildTeamUpdateToOneWithWhereWithoutCalendarEventInput = {
-  where?: Prisma.BuildTeamWhereInput
-  data: Prisma.XOR<Prisma.BuildTeamUpdateWithoutCalendarEventInput, Prisma.BuildTeamUncheckedUpdateWithoutCalendarEventInput>
-}
-
-export type BuildTeamUpdateWithoutCalendarEventInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  backgroundImage?: Prisma.StringFieldUpdateOperationsInput | string
-  invite?: Prisma.StringFieldUpdateOperationsInput | string
-  about?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  ip?: Prisma.StringFieldUpdateOperationsInput | string
-  acceptionMessage?: Prisma.StringFieldUpdateOperationsInput | string
-  allowTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  rejectionMessage?: Prisma.StringFieldUpdateOperationsInput | string
-  trialMessage?: Prisma.StringFieldUpdateOperationsInput | string
-  token?: Prisma.StringFieldUpdateOperationsInput | string
-  version?: Prisma.StringFieldUpdateOperationsInput | string
-  allowBuilderClaim?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  instantAccept?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
-  applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
-  creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
-  claims?: Prisma.ClaimUpdateManyWithoutBuildTeamNestedInput
-  showcases?: Prisma.ShowcaseUpdateManyWithoutBuildTeamNestedInput
-  socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
-  UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
-  members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
-}
-
-export type BuildTeamUncheckedUpdateWithoutCalendarEventInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  icon?: Prisma.StringFieldUpdateOperationsInput | string
-  backgroundImage?: Prisma.StringFieldUpdateOperationsInput | string
-  invite?: Prisma.StringFieldUpdateOperationsInput | string
-  about?: Prisma.StringFieldUpdateOperationsInput | string
-  creatorId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  ip?: Prisma.StringFieldUpdateOperationsInput | string
-  acceptionMessage?: Prisma.StringFieldUpdateOperationsInput | string
-  allowTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  rejectionMessage?: Prisma.StringFieldUpdateOperationsInput | string
-  trialMessage?: Prisma.StringFieldUpdateOperationsInput | string
-  token?: Prisma.StringFieldUpdateOperationsInput | string
-  version?: Prisma.StringFieldUpdateOperationsInput | string
-  allowBuilderClaim?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  instantAccept?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  color?: Prisma.StringFieldUpdateOperationsInput | string
-  Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
-  applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
-  claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
-  showcases?: Prisma.ShowcaseUncheckedUpdateManyWithoutBuildTeamNestedInput
-  socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
-  UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
-  members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
 export type BuildTeamCreateManyCreatorInput = {
@@ -2377,6 +2229,7 @@ export type BuildTeamCreateManyCreatorInput = {
   webhook?: string | null
   allowApplications?: boolean | null
   color?: string
+  supportsBedrock?: boolean | null
 }
 
 export type BuildTeamUpdateWithoutCreatorInput = {
@@ -2401,6 +2254,7 @@ export type BuildTeamUpdateWithoutCreatorInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUpdateManyWithoutBuildTeamNestedInput
@@ -2408,7 +2262,6 @@ export type BuildTeamUpdateWithoutCreatorInput = {
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -2434,6 +2287,7 @@ export type BuildTeamUncheckedUpdateWithoutCreatorInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
@@ -2441,7 +2295,6 @@ export type BuildTeamUncheckedUpdateWithoutCreatorInput = {
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
   members?: Prisma.UserUncheckedUpdateManyWithoutJoinedBuildTeamsNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -2467,6 +2320,7 @@ export type BuildTeamUncheckedUpdateManyWithoutCreatorInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type BuildTeamUpdateWithoutMembersInput = {
@@ -2491,6 +2345,7 @@ export type BuildTeamUpdateWithoutMembersInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUpdateManyWithoutBuildTeamNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedBuildTeamsNestedInput
@@ -2498,7 +2353,6 @@ export type BuildTeamUpdateWithoutMembersInput = {
   showcases?: Prisma.ShowcaseUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUpdateManyWithoutBuildTeamNestedInput
-  CalendarEvent?: Prisma.CalendarEventUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -2525,13 +2379,13 @@ export type BuildTeamUncheckedUpdateWithoutMembersInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   Application?: Prisma.ApplicationUncheckedUpdateManyWithoutBuildteamNestedInput
   applicationQuestions?: Prisma.ApplicationQuestionUncheckedUpdateManyWithoutBuildTeamNestedInput
   claims?: Prisma.ClaimUncheckedUpdateManyWithoutBuildTeamNestedInput
   showcases?: Prisma.ShowcaseUncheckedUpdateManyWithoutBuildTeamNestedInput
   socials?: Prisma.SocialUncheckedUpdateManyWithoutBuildTeamNestedInput
   UserPermission?: Prisma.UserPermissionUncheckedUpdateManyWithoutBuildTeamNestedInput
-  CalendarEvent?: Prisma.CalendarEventUncheckedUpdateManyWithoutBuildTeamNestedInput
   responseTemplate?: Prisma.ApplicationResponseTemplateUncheckedUpdateManyWithoutBuildteamNestedInput
 }
 
@@ -2558,6 +2412,7 @@ export type BuildTeamUncheckedUpdateManyWithoutMembersInput = {
   webhook?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   allowApplications?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   color?: Prisma.StringFieldUpdateOperationsInput | string
+  supportsBedrock?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 
@@ -2573,7 +2428,6 @@ export type BuildTeamCountOutputType = {
   socials: number
   UserPermission: number
   members: number
-  CalendarEvent: number
   responseTemplate: number
 }
 
@@ -2585,7 +2439,6 @@ export type BuildTeamCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   socials?: boolean | BuildTeamCountOutputTypeCountSocialsArgs
   UserPermission?: boolean | BuildTeamCountOutputTypeCountUserPermissionArgs
   members?: boolean | BuildTeamCountOutputTypeCountMembersArgs
-  CalendarEvent?: boolean | BuildTeamCountOutputTypeCountCalendarEventArgs
   responseTemplate?: boolean | BuildTeamCountOutputTypeCountResponseTemplateArgs
 }
 
@@ -2651,13 +2504,6 @@ export type BuildTeamCountOutputTypeCountMembersArgs<ExtArgs extends runtime.Typ
 /**
  * BuildTeamCountOutputType without action
  */
-export type BuildTeamCountOutputTypeCountCalendarEventArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CalendarEventWhereInput
-}
-
-/**
- * BuildTeamCountOutputType without action
- */
 export type BuildTeamCountOutputTypeCountResponseTemplateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ApplicationResponseTemplateWhereInput
 }
@@ -2686,6 +2532,7 @@ export type BuildTeamSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   webhook?: boolean
   allowApplications?: boolean
   color?: boolean
+  supportsBedrock?: boolean
   Application?: boolean | Prisma.BuildTeam$ApplicationArgs<ExtArgs>
   applicationQuestions?: boolean | Prisma.BuildTeam$applicationQuestionsArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2694,7 +2541,6 @@ export type BuildTeamSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   socials?: boolean | Prisma.BuildTeam$socialsArgs<ExtArgs>
   UserPermission?: boolean | Prisma.BuildTeam$UserPermissionArgs<ExtArgs>
   members?: boolean | Prisma.BuildTeam$membersArgs<ExtArgs>
-  CalendarEvent?: boolean | Prisma.BuildTeam$CalendarEventArgs<ExtArgs>
   responseTemplate?: boolean | Prisma.BuildTeam$responseTemplateArgs<ExtArgs>
   _count?: boolean | Prisma.BuildTeamCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["buildTeam"]>
@@ -2722,6 +2568,7 @@ export type BuildTeamSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   webhook?: boolean
   allowApplications?: boolean
   color?: boolean
+  supportsBedrock?: boolean
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["buildTeam"]>
 
@@ -2748,6 +2595,7 @@ export type BuildTeamSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   webhook?: boolean
   allowApplications?: boolean
   color?: boolean
+  supportsBedrock?: boolean
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["buildTeam"]>
 
@@ -2774,9 +2622,10 @@ export type BuildTeamSelectScalar = {
   webhook?: boolean
   allowApplications?: boolean
   color?: boolean
+  supportsBedrock?: boolean
 }
 
-export type BuildTeamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "icon" | "backgroundImage" | "invite" | "about" | "creatorId" | "createdAt" | "location" | "slug" | "ip" | "acceptionMessage" | "allowTrial" | "rejectionMessage" | "trialMessage" | "token" | "version" | "allowBuilderClaim" | "instantAccept" | "webhook" | "allowApplications" | "color", ExtArgs["result"]["buildTeam"]>
+export type BuildTeamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "icon" | "backgroundImage" | "invite" | "about" | "creatorId" | "createdAt" | "location" | "slug" | "ip" | "acceptionMessage" | "allowTrial" | "rejectionMessage" | "trialMessage" | "token" | "version" | "allowBuilderClaim" | "instantAccept" | "webhook" | "allowApplications" | "color" | "supportsBedrock", ExtArgs["result"]["buildTeam"]>
 export type BuildTeamInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   Application?: boolean | Prisma.BuildTeam$ApplicationArgs<ExtArgs>
   applicationQuestions?: boolean | Prisma.BuildTeam$applicationQuestionsArgs<ExtArgs>
@@ -2786,7 +2635,6 @@ export type BuildTeamInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   socials?: boolean | Prisma.BuildTeam$socialsArgs<ExtArgs>
   UserPermission?: boolean | Prisma.BuildTeam$UserPermissionArgs<ExtArgs>
   members?: boolean | Prisma.BuildTeam$membersArgs<ExtArgs>
-  CalendarEvent?: boolean | Prisma.BuildTeam$CalendarEventArgs<ExtArgs>
   responseTemplate?: boolean | Prisma.BuildTeam$responseTemplateArgs<ExtArgs>
   _count?: boolean | Prisma.BuildTeamCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2808,7 +2656,6 @@ export type $BuildTeamPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     socials: Prisma.$SocialPayload<ExtArgs>[]
     UserPermission: Prisma.$UserPermissionPayload<ExtArgs>[]
     members: Prisma.$UserPayload<ExtArgs>[]
-    CalendarEvent: Prisma.$CalendarEventPayload<ExtArgs>[]
     responseTemplate: Prisma.$ApplicationResponseTemplatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2834,6 +2681,7 @@ export type $BuildTeamPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     webhook: string | null
     allowApplications: boolean | null
     color: string
+    supportsBedrock: boolean | null
   }, ExtArgs["result"]["buildTeam"]>
   composites: {}
 }
@@ -3236,7 +3084,6 @@ export interface Prisma__BuildTeamClient<T, Null = never, ExtArgs extends runtim
   socials<T extends Prisma.BuildTeam$socialsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuildTeam$socialsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SocialPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   UserPermission<T extends Prisma.BuildTeam$UserPermissionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuildTeam$UserPermissionArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   members<T extends Prisma.BuildTeam$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuildTeam$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  CalendarEvent<T extends Prisma.BuildTeam$CalendarEventArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuildTeam$CalendarEventArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CalendarEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   responseTemplate<T extends Prisma.BuildTeam$responseTemplateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BuildTeam$responseTemplateArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationResponseTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3289,6 +3136,7 @@ export interface BuildTeamFieldRefs {
   readonly webhook: Prisma.FieldRef<"BuildTeam", 'String'>
   readonly allowApplications: Prisma.FieldRef<"BuildTeam", 'Boolean'>
   readonly color: Prisma.FieldRef<"BuildTeam", 'String'>
+  readonly supportsBedrock: Prisma.FieldRef<"BuildTeam", 'Boolean'>
 }
     
 
@@ -3850,30 +3698,6 @@ export type BuildTeam$membersArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
-}
-
-/**
- * BuildTeam.CalendarEvent
- */
-export type BuildTeam$CalendarEventArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the CalendarEvent
-   */
-  select?: Prisma.CalendarEventSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the CalendarEvent
-   */
-  omit?: Prisma.CalendarEventOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.CalendarEventInclude<ExtArgs> | null
-  where?: Prisma.CalendarEventWhereInput
-  orderBy?: Prisma.CalendarEventOrderByWithRelationInput | Prisma.CalendarEventOrderByWithRelationInput[]
-  cursor?: Prisma.CalendarEventWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.CalendarEventScalarFieldEnum | Prisma.CalendarEventScalarFieldEnum[]
 }
 
 /**

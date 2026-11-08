@@ -1,4 +1,4 @@
-import { Application, ApplicationQuestionType, ApplicationStatus } from '@prisma/client'
+import { Application, ApplicationQuestionType, ApplicationStatus } from '@repo/db'
 import { Request, Response } from 'express'
 import { WebhookType, sendBtWebhook } from '../util/BtWebhooks.js'
 import { ERROR_GENERIC, ERROR_NO_PERMISSION, ERROR_VALIDATION } from '../util/Errors.js'
@@ -486,7 +486,7 @@ class ApplicationController {
 
 				// Send message to all reviewers
 				await this.core.getDiscord().sendBotMessage(
-					`**${buildteam.name}** \\nNew Application from <@${req.user.discordId}> (${req.user.username}). Review it [here](${process.env.FRONTEND_URL}/teams/${buildteam.slug}/manage/review/${application.id})`,
+					`**${buildteam.name}** \\nNew Application from <@${req.user.discordId}> (${req.user.username}). Review it [here](https://my.buildtheearth.net/team/${buildteam.slug}/applications/${application.id})`,
 					reviewers.map((r) => r.user.discordId),
 					(e) => ERROR_GENERIC(req, res, 500, e),
 				)

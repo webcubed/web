@@ -43,6 +43,10 @@
 		"header": {
 			"cta": "Empezar",
 			"visit": "Visitar",
+			"dashboard": "Panel",
+			"account": "Cuenta",
+			"login": "Iniciar sesión",
+			"signup": "Registrarse",
 			"toggleNavigation": "Alternar enlaces de navegación"
 		},
 		"links": {
@@ -125,6 +129,10 @@
 		"description": "La página que estás intentando abrir no existe. Es posible que la dirección sea incorrecta o que la página se haya movido a otro enlace.",
 		"cta": "Volver"
 	},
+	"error": {
+		"title": "Algo salió mal",
+		"description": "Ocurrió un error inesperado al cargar esta página. Inténtalo de nuevo más tarde."
+	},
 	"teams": {
 		"seo": {
 			"title": "Equipos de construcción",
@@ -140,7 +148,7 @@
 			"location": "Una lista de países en los que este equipo construye",
 			"members": "Número de miembros en este equipo"
 		},
-		"memberCount": "{count, plural, =0 {no members} =1 {1 member} other {# members}}",
+		"memberCount": "{count, plural, =0 {sin miembros} =1 {1 miembro} other {# miembros}}",
 		"ownPage": {
 			"seo": {
 				"notFoundTitle": "Equipo de construcción no encontrado",
@@ -152,6 +160,7 @@
 			"overview": "Vista general",
 			"details": "Detalles",
 			"ip": "IP de Minecraft",
+			"discord": "Invitación de Discord",
 			"version": "Versión de Minecraft",
 			"location": "{count, plural, =1 {Ubicación} other {Ubicaciones}}",
 			"moreLocations": "{list}, +{count}",
@@ -223,6 +232,16 @@
 		"searchCountries": "Buscar países...",
 		"content": {
 			"text": "BuildTheEarth está organizado en múltiples <b>Equipos de Construcción</b>, cada uno responsable de recrear diferentes regiones del mundo. Los Equipos de Construcción a menudo se enfocan en <b>países o regiones específicas</b>, lo que te permite contribuir a áreas que te apasionan.<br></br><br></br>No hay restricciones sobre a cuáles o cuántos Equipos de Construcción puedes unirte, ¡así que siéntete libre de explorar tantos como quieras!<br></br><br></br>Cada Equipo de Construcción tiene su propio servidor donde puedes colaborar con otros constructores, participar en eventos y obtener apoyo. Debido a esto, no hay un \"proceso de aplicación\" único.<br></br>En cambio, simplemente <b>únete al servidor de Discord</b> del Equipo de Construcción que te interese y sigue sus simples instrucciones para comenzar.<br></br><br></br>¡También puedes unirte a nuestro Servidor Central (Minecraft: <ip>buildtheearth.net</ip>, <discord>Discord</discord>) para obtener ayuda y conocer a otros constructores de todo el mundo!"
+		},
+		"builderNotice": {
+			"builderTitle": "Cuentas para aspirantes a constructores",
+			"builderDescription": "Las cuentas de la plataforma están destinadas exclusivamente a los aspirantes a constructores que desean reclamar terrenos y construir con un equipo de construcción. No se requiere registro para explorar.",
+			"signUp": "Registrarse como constructor",
+			"logIn": "Iniciar sesión",
+			"visitorTitle": "¿Solo explorando? No se requiere cuenta",
+			"visitorDescription": "¡No necesitas una cuenta para explorar! Descubre nuestro mapa interactivo, explora las creaciones destacadas o únete a nuestros servidores como visitante.",
+			"exploreMap": "Explorar mapa",
+			"visitServers": "Visitar servidores"
 		},
 		"joinServer": {
 			"title": "Construir en {country}",
@@ -383,6 +402,72 @@
 		"readMore": "Leer más"
 	},
 	"map": {
+		"controls": {
+			"hideLayer": "Ocultar {layer}",
+			"showLayerFull": "Mostrar {layer} (completo)",
+			"showLayerPartial": "Mostrar {layer} (parcial)",
+			"showLayer": "Mostrar {layer}",
+			"toggleLayer": "Alternar capa de {layer}",
+			"layers": {
+				"heatmap": "mapa de calor",
+				"claims": "reclamaciones"
+			},
+			"zoomIn": "Acercar",
+			"zoomOut": "Alejar",
+			"geolocate": "Mostrar mi ubicación",
+			"enterFullscreen": "Pantalla completa",
+			"exitFullscreen": "Salir de pantalla completa"
+		},
+		"claim": {
+			"size": "Tamaño",
+			"buildings": "Edificios",
+			"buildTeam": "BuildTeam",
+			"owner": "Propietario",
+			"builders": "Constructores",
+			"externallySynced": "La reclamación se sincroniza externamente. Es posible que falte información",
+			"imageAlt": "Imagen {id} de la reclamación",
+			"close": "Cerrar",
+			"title": "Reclamación",
+			"unnamed": "Reclamación sin nombre",
+			"loadError": "No se pudo cargar esta reclamación.",
+			"retry": "Reintentar",
+			"finished": "Terminada",
+			"inProgress": "En progreso",
+			"synced": "Sincronizada",
+			"created": "Creada",
+			"noOwner": "Sin propietario",
+			"showAll": "Mostrar todos ({count})",
+			"showLess": "Mostrar menos",
+			"moreDetails": "Detalles",
+			"address": "Dirección",
+			"copyLink": "Copiar enlace",
+			"copyCoordinates": "Copiar coordenadas",
+			"openInGoogleMaps": "Abrir en Google Maps",
+			"copiedTitle": "Copiado",
+			"copiedMessage": "Pégalo donde quieras.",
+			"openInOpenStreetMap": "Abrir en OpenStreetMap",
+			"openInAppleMaps": "Abrir en Apple Maps"
+		},
+		"contextMenu": {
+			"noCoordinates": "Sin coordenadas",
+			"copy": "Copiar",
+			"coordinates": "Coordenadas",
+			"blockCoordinates": "Coordenadas de bloque",
+			"chunkCoordinates": "Coordenadas de chunk",
+			"regionFile": "Nombre del archivo de región",
+			"open": "Abrir",
+			"googleMaps": "Google Maps",
+			"bingMaps": "Bing Maps",
+			"openStreetMap": "OpenStreetMap",
+			"googleEarth": "Google Earth Web",
+			"copiedTitle": "Copiado",
+			"copiedMessage": "Pégalo donde quieras."
+		},
+		"chooser": {
+			"title": "Varias reclamaciones aquí",
+			"unnamed": "Reclamación sin nombre",
+			"size": "{size} m²"
+		},
 		"seo": {
 			"title": "Mapa del proyecto",
 			"description": "Explora parcelas activas o completadas de BuildTheEarth en el mapa mundial interactivo."

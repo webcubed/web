@@ -16,6 +16,7 @@ import {
 	Title,
 } from '@mantine/core'
 import {
+	IconBrandMinecraft,
 	IconCalendar,
 	IconClockExclamation,
 	IconDatabaseExclamation,
@@ -24,7 +25,9 @@ import {
 	IconExternalLink,
 	IconFileCheck,
 	IconFiles,
+	IconKey,
 	IconLink,
+	IconMail,
 	IconPolygon,
 	IconShieldLock,
 	IconSwipe,
@@ -65,7 +68,76 @@ export default async function Page() {
 				</Group>
 				<SimpleGrid cols={{ base: 1, md: 2 }}>
 					<Flex h="100%" mih={50} gap="md" justify="flex-start" align="flex-start" direction="column">
-						<TextCard title="Active Sessions" icon={IconDevices} style={{ width: '100%', flexGrow: 1 }}>
+						<SimpleGrid cols={{ base: 1, sm: 2 }} w="100%" h="100%" style={{ flexGrow: 1, gridAutoRows: '1fr' }}>
+							<TextCard
+								title="Username"
+								icon={IconUser}
+								subtitle="Website username"
+								style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+							>
+								<Group gap="sm" h={30} align="center">
+									<Skeleton h={30} w={30} radius="xl" />
+									<Skeleton h={14} w="60%" radius="sm" />
+								</Group>
+							</TextCard>
+							<TextCard
+								title="Pending Actions"
+								icon={IconClockExclamation}
+								subtitle="Required Actions can be added in Keycloak"
+								style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+							>
+								<Flex align="center" h={30}>
+									<Skeleton h={14} w="55%" radius="sm" />
+								</Flex>
+							</TextCard>
+							<TextCard
+								title="Minecraft Profile"
+								icon={IconBrandMinecraft}
+								subtitle="Linked Minecraft Profile"
+								style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+							>
+								<Group gap="sm" h={30} align="center">
+									<Skeleton h={30} w={30} radius="sm" />
+									<Skeleton h={14} w="60%" radius="sm" />
+								</Group>
+							</TextCard>
+							<TextCard
+								title="Account Security"
+								icon={IconShieldLock}
+								subtitle="Account's Security Status"
+								style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+							>
+								<Group gap={6} h={30} align="center">
+									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
+									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
+									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
+									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
+								</Group>
+							</TextCard>
+							<TextCard
+								title="Email"
+								icon={IconMail}
+								subtitle="Verified email"
+								style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+							>
+								<Flex align="center" h={30}>
+									<Skeleton h={14} w="75%" radius="sm" />
+								</Flex>
+							</TextCard>
+							<TextCard
+								title="Account Age"
+								icon={IconCalendar}
+								subtitle="or since --/--/----"
+								style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+							>
+								<Flex align="center" h={30}>
+									<Skeleton h={20} w="40%" radius="sm" />
+								</Flex>
+							</TextCard>
+						</SimpleGrid>
+					</Flex>
+					<Flex h="100%" mih={50} gap="md" justify="flex-start" align="flex-start" direction="column">
+						<TextCard title="Active Sessions" icon={IconDevices} style={{ width: '100%' }}>
 							<Table
 								highlightOnHover
 								data={{
@@ -74,60 +146,25 @@ export default async function Page() {
 								}}
 							/>
 						</TextCard>
+						<TextCard title="Identity Providers" icon={IconLink} style={{ width: '100%' }}>
+							<Table
+								highlightOnHover
+								data={{
+									head: ['Provider', 'User #', 'Username'],
+									body: placeholderRows(2, 3),
+								}}
+							/>
+						</TextCard>
+						<TextCard title="External Consents" icon={IconSwipe} style={{ width: '100%' }}>
+							<Table
+								highlightOnHover
+								data={{
+									head: ['Client ID', 'Granted Scopes', 'Created', 'Updated'],
+									body: placeholderRows(2, 4),
+								}}
+							/>
+						</TextCard>
 					</Flex>
-					<Grid h="100%" styles={{ inner: { height: 'calc(100% + var(--mantine-spacing-md))' } }}>
-						<GridCol span={{ base: 12, sm: 6 }}>
-							<TextCard
-								title="Account Security"
-								icon={IconShieldLock}
-								subtitle="Account's Security Status"
-								style={{ height: '100%' }}
-							>
-								<Group gap={6}>
-									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
-									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
-									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
-									<ColorSwatch color="var(--mantine-color-dark-4)" radius="sm" size="24px" />
-								</Group>
-							</TextCard>
-						</GridCol>
-						<GridCol span={{ base: 12, sm: 6 }}>
-							<TextCard
-								title="Pending Actions"
-								icon={IconClockExclamation}
-								subtitle="Required Actions can be added in Keycloak"
-								style={{ height: '100%' }}
-							>
-								<Skeleton h={14} w="55%" radius="sm" />
-							</TextCard>
-						</GridCol>
-						<GridCol span={12}>
-							<TextCard title="Identity Providers" icon={IconLink}>
-								<Table
-									highlightOnHover
-									data={{
-										head: ['Provider', 'User #', 'Username'],
-										body: placeholderRows(2, 3),
-									}}
-								/>
-							</TextCard>
-						</GridCol>
-						<GridCol span={{ base: 12, sm: 6 }}>
-							<TextCard
-								isText
-								title="External Consents"
-								icon={IconSwipe}
-								subtitle="have been granted from the User's Account"
-							>
-								-- Consents
-							</TextCard>
-						</GridCol>
-						<GridCol span={{ base: 12, sm: 6 }}>
-							<TextCard isText title="Account Age" icon={IconCalendar} subtitle="or since --/--/----">
-								-- Days
-							</TextCard>
-						</GridCol>
-					</Grid>
 				</SimpleGrid>
 				<Title order={2} mt="xl" mb="md">
 					Build Teams and Applications
@@ -210,7 +247,7 @@ export default async function Page() {
 					Permissions
 				</Title>
 				<Grid>
-					<GridCol span={{ base: 12, md: 4 }}>
+					<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
 						<TextCard
 							isText
 							title="Managed Build Teams"
@@ -221,7 +258,7 @@ export default async function Page() {
 							-- Teams
 						</TextCard>
 					</GridCol>
-					<GridCol span={{ base: 12, md: 4 }}>
+					<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
 						<TextCard
 							isText
 							title="Global Permissions"
@@ -231,7 +268,7 @@ export default async function Page() {
 							-- Nodes
 						</TextCard>
 					</GridCol>
-					<GridCol span={{ base: 12, md: 4 }}>
+					<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
 						<TextCard
 							isText
 							title="Internal Groups"
@@ -240,6 +277,17 @@ export default async function Page() {
 							style={{ height: '100%' }}
 						>
 							-- Groups
+						</TextCard>
+					</GridCol>
+					<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
+						<TextCard
+							isText
+							title="Keycloak Roles"
+							icon={IconKey}
+							subtitle="effective realm and client roles"
+							style={{ height: '100%' }}
+						>
+							-- Roles
 						</TextCard>
 					</GridCol>
 					<GridCol span={12}>
@@ -262,6 +310,28 @@ export default async function Page() {
 											<ActionIcon key={`perm-row-${rowIndex}-actions`} size="sm" variant="subtle" disabled>
 												<IconDots style={{ width: '70%', height: '70%' }} stroke={1.5} />
 											</ActionIcon>,
+										]),
+									}}
+								/>
+							</ScrollArea>
+						</TextCard>
+					</GridCol>
+					<GridCol span={12}>
+						<TextCard title="Keycloak Roles" icon={IconKey} href="#" hrefText="Edit in Keycloak">
+							<ScrollArea h="40vh" w="100%" type="always">
+								<Table
+									highlightOnHover
+									stickyHeader
+									data={{
+										head: ['Role Name', 'Container / Client', 'Composite'],
+										body: Array.from({ length: 8 }, (_, rowIndex) => [
+											<Code key={`role-row-${rowIndex}-name`} color="blue">
+												role.placeholder
+											</Code>,
+											<Skeleton key={`role-row-${rowIndex}-container`} h={14} w="50%" radius="sm" />,
+											<Badge key={`role-row-${rowIndex}-composite`} variant="light" color="gray">
+												STATUS
+											</Badge>,
 										]),
 									}}
 								/>

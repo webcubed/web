@@ -67,7 +67,6 @@ export const ModelName = {
   ApplicationAnswer: 'ApplicationAnswer',
   ApplicationResponseTemplate: 'ApplicationResponseTemplate',
   Upload: 'Upload',
-  CalendarEvent: 'CalendarEvent',
   JsonStore: 'JsonStore'
 } as const
 
@@ -94,7 +93,9 @@ export const UserScalarFieldEnum = {
   avatar: 'avatar',
   username: 'username',
   minecraft: 'minecraft',
-  channels: 'channels'
+  channels: 'channels',
+  onboardingCompletedAt: 'onboardingCompletedAt',
+  onboardingDismissed: 'onboardingDismissed'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -134,7 +135,8 @@ export const BuildTeamScalarFieldEnum = {
   instantAccept: 'instantAccept',
   webhook: 'webhook',
   allowApplications: 'allowApplications',
-  color: 'color'
+  color: 'color',
+  supportsBedrock: 'supportsBedrock'
 } as const
 
 export type BuildTeamScalarFieldEnum = (typeof BuildTeamScalarFieldEnum)[keyof typeof BuildTeamScalarFieldEnum]
@@ -301,21 +303,6 @@ export const UploadScalarFieldEnum = {
 } as const
 
 export type UploadScalarFieldEnum = (typeof UploadScalarFieldEnum)[keyof typeof UploadScalarFieldEnum]
-
-
-export const CalendarEventScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  city: 'city',
-  country: 'country',
-  start: 'start',
-  end: 'end',
-  discordLink: 'discordLink',
-  buildTeamId: 'buildTeamId'
-} as const
-
-export type CalendarEventScalarFieldEnum = (typeof CalendarEventScalarFieldEnum)[keyof typeof CalendarEventScalarFieldEnum]
 
 
 export const JsonStoreScalarFieldEnum = {

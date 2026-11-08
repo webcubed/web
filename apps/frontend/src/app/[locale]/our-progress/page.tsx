@@ -2,7 +2,7 @@ import ProgressCard from '@/components/core/card/ProgressCard'
 import StatCard from '@/components/core/card/StatCard'
 import Wrapper from '@/components/layout/Wrapper'
 import prisma from '@/util/db'
-import { getLanguageAlternates } from '@/util/seo'
+import { getLanguageAlternates, getLocalizedUrl } from '@/util/seo'
 import { Box, Container, Grid, GridCol, SimpleGrid, Text, Title } from '@mantine/core'
 import { IconBuildingSkyscraper, IconMap, IconUsersGroup } from '@tabler/icons-react'
 import { Metadata } from 'next'
@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 		title: t('title'),
 		description: t('description'),
 		alternates: {
+			canonical: getLocalizedUrl(locale, '/our-progress'),
 			languages: getLanguageAlternates('/our-progress'),
 		},
 	}
@@ -41,7 +42,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 	const t = await getTranslations('our-progress')
 	const formatter = new Intl.NumberFormat(locale)
 
-	const [activeClaims, finishedClaims, buildings, areas, finishedAreas, communityMembers] = await prisma.$transaction([
+	const [activeClaims, finishedClaims, buildings, areas, finishedAreas, communityMembers] = await Promise.all([
 		prisma.claim.count({ where: { active: true } }),
 		prisma.claim.count({ where: { active: true, finished: true } }),
 		prisma.claim.aggregate({

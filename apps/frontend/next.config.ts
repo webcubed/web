@@ -10,44 +10,104 @@ const nextConfig: NextConfig = {
 		remotePatterns: [{ protocol: 'https', hostname: 'cms.buildtheearth.net', pathname: '/assets/**' }],
 	},
 	async headers() {
+		const getOrigin = (urlStr?: string): string | undefined => {
+			if (!urlStr) return undefined
+			try {
+				return new URL(urlStr).origin
+			} catch {
+				return undefined
+			}
+		}
+
+		const mapStyleOrigin = getOrigin(process.env.NEXT_PUBLIC_MAP_STYLE_URL)
+		const mapStylePathPrefix = process.env.NEXT_PUBLIC_MAP_STYLE_URL?.split('/styles/')[0]
+		const umamiOrigin = getOrigin(process.env.NEXT_PUBLIC_UMAMI_URL)
+
 		const connectSources = [
 			process.env.NEXT_PUBLIC_FRONTEND_URL,
+			process.env.NEXT_PUBLIC_API_URL,
+			process.env.NEXT_PUBLIC_CDN_URL,
 			process.env.CMS_URL,
 			process.env.NEXT_PUBLIC_UMAMI_URL?.replace('/script.js', ''),
-			process.env.NEXT_PUBLIC_MAP_STYLE_URL?.split('/styles/')[0],
+			umamiOrigin,
+			mapStyleOrigin,
+			mapStylePathPrefix,
+			'https://api.mapbox.com',
+			'https://*.tiles.mapbox.com',
+			'https://events.mapbox.com',
+			'https://basemaps.cartocdn.com',
+			'https://*.cartocdn.com',
+			'https://demotiles.maplibre.org',
 			'https://static.cloudflareinsights.com',
 			'https://cloudflareinsights.com',
 			'https://cdn.discordapp.com',
 			'https://orangemug.github.io',
 			'https://cdn.jsdelivr.net',
 			'https://umami.buildtheearth.net',
+			...(process.env.NODE_ENV !== 'production' ? ['ws:', 'wss:'] : []),
 		]
 			.filter(Boolean)
 			.join(' ')
-		const scriptSources = ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://static.cloudflareinsights.com'].join(
-			' ',
-		)
+
+		const scriptSources = [
+			"'self'",
+			"'unsafe-inline'",
+			"'unsafe-eval'",
+			'https://static.cloudflareinsights.com',
+			'https://umami.buildtheearth.net',
+			umamiOrigin,
+		]
+			.filter(Boolean)
+			.join(' ')
+
+		const securityHeaders = [
+			{
+				key: 'Content-Security-Policy',
+				value: [
+					"default-src 'self'",
+					"base-uri 'self'",
+					"frame-ancestors 'none'",
+					"form-action 'self'",
+					"img-src 'self' data: blob: https:",
+					`connect-src 'self' blob: data: ${connectSources}`,
+					"style-src 'self' 'unsafe-inline'",
+					`script-src ${scriptSources}`,
+					`script-src-elem ${scriptSources}`,
+					"worker-src 'self' blob:",
+					"font-src 'self' data:",
+					"object-src 'none'",
+				].join('; '),
+			},
+			{
+				key: 'X-Frame-Options',
+				value: 'DENY',
+			},
+			{
+				key: 'X-Content-Type-Options',
+				value: 'nosniff',
+			},
+			{
+				key: 'Referrer-Policy',
+				value: 'strict-origin-when-cross-origin',
+			},
+			{
+				key: 'Permissions-Policy',
+				value: 'camera=(), microphone=(), geolocation=(self)',
+			},
+			...(process.env.NODE_ENV === 'production'
+				? [
+						{
+							key: 'Strict-Transport-Security',
+							value: 'max-age=63072000; includeSubDomains; preload',
+						},
+					]
+				: []),
+		]
 
 		return [
 			{
 				source: '/(.*)',
-				headers: [
-					{
-						key: 'Content-Security-Policy',
-						value: [
-							"default-src 'self'",
-							"base-uri 'self'",
-							"frame-ancestors 'none'",
-							'img-src * data: blob:',
-							`connect-src 'self' ${connectSources}`,
-							"style-src 'self' 'unsafe-inline'",
-							`script-src ${scriptSources}`,
-							`script-src-elem ${scriptSources}`,
-							'worker-src blob:',
-							'object-src none',
-						].join('; '),
-					},
-				],
+				headers: securityHeaders,
 			},
 		]
 	},
@@ -66,17 +126,45 @@ const nextConfig: NextConfig = {
 		]
 	},
 	async redirects() {
+		const dashboardUrl = (process.env.NEXT_PUBLIC_DASHBOARD_URL || 'https://my.buildtheearth.net').replace(/\/$/, '')
+
 		return [
-			{
-				source: '/donate',
-				destination: '/download',
-				permanent: true,
-			},
-			{
-				source: '/support-us',
-				destination: '/download',
-				permanent: true,
-			},
+			// Dashboard
+			{ source: '/teams/:slug/manage/:path*', destination: `${dashboardUrl}/team/:slug`, permanent: true },
+			{ source: '/teams/:slug/apply', destination: `${dashboardUrl}/apply/:slug`, permanent: true },
+			{ source: '/teams/:slug/join', destination: `${dashboardUrl}/apply/:slug`, permanent: true },
+			{ source: '/me', destination: `${dashboardUrl}/`, permanent: true },
+			{ source: '/me/:path*', destination: `${dashboardUrl}/`, permanent: true },
+			{ source: '/admin', destination: `${dashboardUrl}/`, permanent: true },
+			{ source: '/admin/:path*', destination: `${dashboardUrl}/`, permanent: true },
+			// External
+			{ source: '/discord', destination: 'https://go.buildtheearth.net/dc', permanent: true },
+			{ source: '/merch', destination: 'https://shop.buildtheearth.net', permanent: true },
+			{ source: '/status', destination: 'https://status.buildtheearth.net', permanent: true },
+			{ source: '/translate', destination: 'https://crowdin.com/project/buildtheearth-website', permanent: true },
+			{ source: '/docs', destination: 'https://docs.buildtheearth.net', permanent: true },
+			{ source: '/api/v1/:path*', destination: 'https://api.buildtheearth.net/api/v1/:path*', permanent: true },
+			// Internal
+			{ source: '/donate', destination: '/download', permanent: true },
+			{ source: '/support-us', destination: '/download', permanent: true },
+			{ source: '/patreon', destination: '/download', permanent: true },
+			{ source: '/map/statistics', destination: '/our-progress', permanent: true },
+			{ source: '/join', destination: '/get-started', permanent: true },
+			{ source: '/join/build', destination: '/get-started', permanent: true },
+			{ source: '/join/visit', destination: '/visit', permanent: true },
+			{ source: '/build', destination: '/get-started', permanent: true },
+			{ source: '/apply', destination: '/get-started', permanent: true },
+			{ source: '/getstarted', destination: '/get-started', permanent: true },
+			{ source: '/getstarted/build', destination: '/get-started', permanent: true },
+			{ source: '/getstarted/visit', destination: '/visit', permanent: true },
+			{ source: '/about', destination: '/about-us', permanent: true },
+			{ source: '/aboutus', destination: '/about-us', permanent: true },
+			{ source: '/credits', destination: '/contributors', permanent: true },
+			{ source: '/home', destination: '/', permanent: true },
+			{ source: '/sitemap', destination: '/sitemap.xml', permanent: true },
+			{ source: '/buildteams', destination: '/teams', permanent: true },
+			{ source: '/buildteams/:slug', destination: '/teams/:slug', permanent: true },
+			{ source: '/teams/:slug/builds', destination: '/teams/:slug', permanent: true },
 		]
 	},
 	experimental: { optimizePackageImports: ['@tabler/icons-react'] },

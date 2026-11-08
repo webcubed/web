@@ -1,5 +1,6 @@
 'use client'
 
+import { ACTION_COLORS } from '@/util/actions'
 import { Menu, MenuDropdown, MenuItem, MenuTarget } from '@mantine/core'
 import { IconLogout, IconMap, IconSettings, IconWorld } from '@tabler/icons-react'
 
@@ -15,6 +16,8 @@ const UserMenu = ({ children }: { children: any }) => {
 					component={Link}
 					href="https://buildtheearth.net"
 					target="_blank"
+					rel="noopener noreferrer"
+					color={ACTION_COLORS.view}
 					leftSection={<IconWorld size={14} />}
 				>
 					BuildTheEarth
@@ -23,14 +26,18 @@ const UserMenu = ({ children }: { children: any }) => {
 					component={Link}
 					href="https://buildtheearth.net/map"
 					target="_blank"
+					rel="noopener noreferrer"
+					color={ACTION_COLORS.view}
 					leftSection={<IconMap size={14} />}
 				>
 					Map
 				</Menu.Item>
-				<Menu.Item component={Link} href="/dashboard/me/settings" leftSection={<IconSettings size={14} />}>
+				<Menu.Divider />
+				<Menu.Item component={Link} href="/me/settings" leftSection={<IconSettings size={14} />}>
 					Settings
 				</Menu.Item>
 				<Menu.Divider />
+				<Menu.Label>Danger Zone</Menu.Label>
 				<Menu.Item
 					leftSection={<IconLogout size={14} />}
 					color="red"

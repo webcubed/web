@@ -16,6 +16,7 @@ import Image from 'next/image'
 import { LinksGroup } from './NavbarLinksGroup'
 import { UserButton } from './UserButton'
 import BuildTeamSelector from './BuildTeamSelector'
+import { BUILD_TEAM_MANAGEMENT_TOUR_ID } from './BuildTeamTour'
 import logo from '../../../public/logo.png'
 
 export interface Navbar {
@@ -28,6 +29,7 @@ export interface NavbarLinkShared {
 	permissionType?: 'permission' | 'teamPermission' | 'public'
 	label: string
 	icon: React.FC<any>
+	tourId?: string
 }
 export interface NavbarLink extends NavbarLinkShared {
 	link: string
@@ -54,7 +56,10 @@ const data: (NavbarLink | NavbarLinkGroup)[] = [
 	{
 		label: 'Claims',
 		icon: IconPolygon,
-		links: [{ label: 'Claim Editor', link: '/claims/editor' }],
+		links: [
+			{ label: 'Your Claims', link: '/me/claims' },
+			{ label: 'Claim Editor', link: '/claims/editor' },
+		],
 	},
 	{
 		label: 'BuildTeams',
@@ -62,18 +67,21 @@ const data: (NavbarLink | NavbarLinkGroup)[] = [
 		links: [
 			{ label: 'Participating Teams', link: '/me/teams' },
 			{ label: 'Your Applications', link: '/me/applications' },
+			{ label: 'World Record Certificate', link: '/world-record' },
 		],
 	},
 	{
 		label: 'BuildTeam Management',
 		icon: IconManualGearbox,
+		tourId: BUILD_TEAM_MANAGEMENT_TOUR_ID,
 		prefix: '/team/[team_slug]',
 		teamPermission: 'get-teams',
 		links: [
-			{ label: 'Overview', link: '/' },
+			{ label: 'Overview', link: '' },
 			{ label: 'Applications', link: '/applications' },
 			{ label: 'Members', link: '/members' },
 			{ label: 'Claims', link: '/claims' },
+			{ label: 'Showcase Images', link: '/images' },
 			{ label: 'Application Questions', link: '/questions' },
 			{ label: 'Settings', link: '/edit' },
 		],
@@ -116,7 +124,7 @@ const data: (NavbarLink | NavbarLinkGroup)[] = [
 			{ label: 'FAQ', link: '/am/faq', permission: 'get-faq' },
 			{ label: 'Contacts', link: '/am/contacts', permission: 'get-contacts' },
 			{ label: 'SSO Configuration', link: '/am/sso', permission: 'get-config' },
-			{ label: 'Worker Queue', link: '/am/worker', permission: 'get-config' },
+			{ label: 'Worker Queue', link: '/am/worker', permission: 'manage-worker' },
 		],
 	},
 ]

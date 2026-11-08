@@ -9,6 +9,7 @@ import { Protection } from '@/components/Protection'
 import { getCountryNames } from '@/util/countries'
 import { toHumanDate } from '@/util/date'
 import prisma from '@/util/db'
+import { SafeHtml } from '@repo/shared'
 import {
 	Alert,
 	Button,
@@ -30,6 +31,7 @@ import {
 	IconCalendar,
 	IconCamera,
 	IconEdit,
+	IconExternalLink,
 	IconForms,
 	IconInfoSmall,
 	IconMap,
@@ -40,7 +42,6 @@ import {
 	IconUsers,
 } from '@tabler/icons-react'
 import { Metadata } from 'next'
-import Link from 'next/link'
 import { EditMenu } from './interactivity'
 
 export const metadata: Metadata = {
@@ -85,6 +86,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 				},
 			},
 		},
+		omit: {
+			webhook: true,
+			token: true,
+		},
 	})
 	if (!team) throw Error('Could not find Build Team')
 
@@ -100,6 +105,15 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 						<LinkButton
 							variant="light"
 							color="cyan"
+							href={`https://buildtheearth.net/teams/${team.slug}`}
+							target="_blank"
+							rightSection={<IconExternalLink size={14} />}
+						>
+							Open on Website
+						</LinkButton>
+						<LinkButton
+							variant="light"
+							color="yellow"
 							href={`/team/${team.slug}/edit`}
 							rightSection={<IconEdit size={14} />}
 							disabled={!hasEditPermission}
@@ -143,7 +157,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 							style={{ width: '100%', height: '100%', flexGrow: 1 }}
 						>
 							<ScrollAreaAutosize h="100%" type="auto" offsetScrollbars>
-								<div dangerouslySetInnerHTML={{ __html: team.about }} />
+								<SafeHtml html={team.about} />
 							</ScrollAreaAutosize>
 						</TextCard>
 						<TextCard title="Locations / Countries" icon={IconMap} style={{ width: '100%' }}>
@@ -174,16 +188,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 						</GridCol>
 						<GridCol span={{ base: 6, lg: 4 }}>
 							<TextCard title="Discord Link" icon={IconBrandDiscord}>
-								<Anchor href={team.invite} target="_blank">
-									{team.invite.replace('https://discord', '')}
-								</Anchor>
+								{team.invite ? (
+									<Anchor href={team.invite} target="_blank">
+										{team.invite.replace('https://discord', '')}
+									</Anchor>
+								) : (
+									<Text c="dimmed">None</Text>
+								)}
 							</TextCard>
 						</GridCol>
 						<GridCol span={{ base: 6, lg: 5 }}>
-							<TextCard title="Server IP" icon={IconBrandMinecraft}>
-								<Anchor href={team.ip} target="_blank">
-									{team.ip}
-								</Anchor>
+							<TextCard title="Server IP" icon={IconBrandMinecraft} isText>
+								{team.ip || 'None'}
 							</TextCard>
 						</GridCol>
 						<GridCol span={{ base: 5, lg: 3 }}>

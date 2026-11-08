@@ -90,6 +90,8 @@ export function MapContextMenu({ contextMenuInfo, setContextMenuInfo, oLat, oLng
 					<MenuItem
 						component={Link}
 						target="_blank"
+						color="cyan"
+						rel="noopener noreferrer"
 						href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`}
 						disabled={!data.mc}
 						leftSection={<IconBrandGoogleMaps style={{ width: rem(14), height: rem(14) }} />}
@@ -99,6 +101,8 @@ export function MapContextMenu({ contextMenuInfo, setContextMenuInfo, oLat, oLng
 					<MenuItem
 						component={Link}
 						target="_blank"
+						rel="noopener noreferrer"
+						color="cyan"
 						href={`https://bing.com/maps/default.aspx?cp=${lat}~${lng}&lvl=18`}
 						disabled={!data.mc}
 						leftSection={<IconBrandBing style={{ width: rem(14), height: rem(14) }} />}
@@ -108,7 +112,9 @@ export function MapContextMenu({ contextMenuInfo, setContextMenuInfo, oLat, oLng
 					<MenuItem
 						component={Link}
 						target="_blank"
-						href={`http://www.openstreetmap.org/?lat=${lat}&lon=${lng}&zoom=18&layers=M`}
+						rel="noopener noreferrer"
+						color="cyan"
+						href={`https://www.openstreetmap.org/?lat=${lat}&lon=${lng}&zoom=18&layers=M`}
 						disabled={!data.mc}
 						leftSection={<IconMap style={{ width: rem(14), height: rem(14) }} />}
 					>
@@ -117,6 +123,8 @@ export function MapContextMenu({ contextMenuInfo, setContextMenuInfo, oLat, oLng
 					<MenuItem
 						component={Link}
 						target="_blank"
+						rel="noopener noreferrer"
+						color="cyan"
 						href={`https://earth.google.com/web/@${lat},${lng},12400d`}
 						disabled={!data.mc}
 						leftSection={<IconWorld style={{ width: rem(14), height: rem(14) }} />}

@@ -1,13 +1,17 @@
 'use server'
 import { getSession, hasRole } from '@/util/auth'
-import { checkBuildTeamPermission } from './getUser'
 import { revalidateWebsitePaths } from '@/util/data'
+import { validateAnswer } from '@/util/application/validation'
 import prisma from '@/util/db'
-import redisEventQueue, { RedisEvent } from '@repo/shared/utils/redis'
+import { isOnBteDiscord } from '@/util/discord'
+import keycloakAdmin from '@/util/keycloak'
 import { Application, ApplicationQuestionType, ApplicationStatus } from '@repo/db'
+import { sanitizeHtml } from '@repo/shared'
+import redisEventQueue, { RedisEvent } from '@repo/shared/utils/redis'
 import { randomBytes } from 'crypto'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { checkBuildTeamPermission } from './getUser'
+import { updateMinecraftProfile } from './onboarding'
 
 const socialNameOptions = [
 	'twitter',
@@ -81,13 +85,6 @@ export const adminTransferTeam = async (
 			})
 			console.log('showcases', showcases)
 			return showcases
-		case 'move-calendar':
-			const calendar = await prisma.calendarEvent.updateMany({
-				where: { buildTeamId: id },
-				data: { buildTeamId: destinationId },
-			})
-			console.log('calendar', calendar)
-			return calendar
 		case 'copy-members':
 			const members = await prisma.user.findMany({
 				where: { joinedBuildTeams: { some: { id } } },
@@ -252,7 +249,8 @@ export const userEditTeamInfo = async (formData: FormData): Promise<void> => {
 	const icon = formData.get('icon') as string
 	const backgroundImage = formData.get('backgroundImage') as string
 	const location = formData.get('location') as string
-	const about = formData.get('about') as string
+	const rawAbout = formData.get('about') as string | null
+	const about = rawAbout !== null ? sanitizeHtml(rawAbout) : undefined
 	const ip = formData.get('ip') as string
 	const version = formData.get('version') as string
 	const invite = formData.get('invite') as string
@@ -263,6 +261,7 @@ export const userEditTeamInfo = async (formData: FormData): Promise<void> => {
 	const rejectionMessage = formData.get('rejectionMessage') as string
 	const trialMessage = formData.get('trialMessage') as string
 	const webhook = formData.get('webhook') as string
+	const supportsBedrock = formData.get('supportsBedrock') === 'on'
 
 	const updatedTeam = await prisma.buildTeam.update({
 		where: { id },
@@ -283,6 +282,7 @@ export const userEditTeamInfo = async (formData: FormData): Promise<void> => {
 			rejectionMessage: rejectionMessage ?? undefined,
 			trialMessage: trialMessage ?? undefined,
 			webhook: webhook ?? undefined,
+			supportsBedrock: supportsBedrock ?? undefined,
 		},
 	})
 
@@ -437,7 +437,7 @@ export const ownerGenerateToken = async ({ id }: { id: string }): Promise<void> 
 		discordIds: [userIsOwner.creator.discordId!],
 		content: {
 			title: `${userIsOwner.name} Token Generated`,
-			body: 'You requested a new API Token for the BuildTheEarth API at https://api.buildtheearth.net. Below you will find this token. Please save it somewhere secure.\n\nToken: ||${token}|| \nSlug: `${userIsOwner.slug}`',
+			body: `You requested a new API Token for the BuildTheEarth API at https://api.buildtheearth.net. Below you will find this token. Please save it somewhere secure.\n\nToken: ||${token}|| \nSlug: \`${userIsOwner.slug}\``,
 			emoji: 'FORWARDED',
 		},
 	})
@@ -498,6 +498,10 @@ export const removeMember = async ({
 		})
 	}
 
+	if (memberToRemove) {
+		await sendMemberWebhook('MEMBER_REMOVE', buildTeam, [memberToRemove])
+	}
+
 	revalidatePath(`/am/users/${removeId}`)
 	revalidatePath(`/team/${buildTeam.slug}/members`)
 }
@@ -532,7 +536,7 @@ export const removeMembers = async ({
 
 	const membersToRemove = await prisma.user.findMany({
 		where: { ssoId: { in: removeIds } },
-		select: { discordId: true },
+		select: { id: true, username: true, discordId: true, minecraft: true, avatar: true, ssoId: true },
 	})
 
 	const buildTeam = await prisma.buildTeam.update({
@@ -557,6 +561,8 @@ export const removeMembers = async ({
 			},
 		})
 	}
+
+	await sendMemberWebhook('MEMBER_REMOVE', buildTeam, membersToRemove)
 
 	revalidatePath(`/team/${buildTeam.slug}/members`)
 }
@@ -624,6 +630,8 @@ export const addMember = async ({
 		})
 	}
 
+	await sendMemberWebhook('MEMBER_ADD', buildTeam, [memberToAdd])
+
 	revalidatePath(`/am/users/${addId}`)
 	revalidatePath(`/team/${buildTeam.slug}/members`)
 }
@@ -665,7 +673,7 @@ export const addMembers = async ({
 				{ username: { in: addIds } },
 			],
 		},
-		select: { id: true, ssoId: true, discordId: true },
+		select: { id: true, ssoId: true, discordId: true, username: true, minecraft: true, avatar: true },
 	})
 
 	if (membersToAdd.length === 0) {
@@ -700,6 +708,8 @@ export const addMembers = async ({
 			})
 		}
 	}
+
+	await sendMemberWebhook('MEMBER_ADD', buildTeam, membersToAdd)
 
 	for (const member of membersToAdd) {
 		revalidatePath(`/am/users/${member.ssoId}`)
@@ -865,6 +875,11 @@ export const reviewApplication = async ({
 		throw Error('Application not found')
 	}
 
+	// Accepting a trial application only grants a trial
+	if (status === ApplicationStatus.ACCEPTED && applicationOld.trial) {
+		status = ApplicationStatus.TRIAL
+	}
+
 	const application = await prisma.application.update({
 		where: { id: applicationOld.id, buildteam: { slug: buildTeamSlug } },
 		data: {
@@ -876,7 +891,20 @@ export const reviewApplication = async ({
 		include: { user: true, buildteam: true },
 	})
 
-	if (status === ApplicationStatus.ACCEPTED || status === ApplicationStatus.TRIAL) {
+	if (status === ApplicationStatus.TRIAL) {
+		// Like the old API: trial builders get the trial message, but are not added as members and get no builder role
+		await redisEventQueue.addJob(RedisEvent.SEND_DISCORD_DM, {
+			discordIds: [application.user.discordId!],
+			content: parseApplicationMessage(
+				application.buildteam.trialMessage,
+				application,
+				application.user,
+				application.buildteam,
+			),
+		})
+	}
+
+	if (status === ApplicationStatus.ACCEPTED) {
 		await prisma.buildTeam.update({
 			where: { slug: buildTeamSlug },
 			data: {
@@ -960,12 +988,60 @@ export const reviewApplication = async ({
 	return application
 }
 
-export const applyToBuildTeam = async (
-	data: { userId: string; buildTeamSlug: string },
+/**
+ * Errors with a message that is safe and useful to show to the applicant.
+ * Next.js replaces the message of errors thrown from server actions with a generic one in production builds,
+ * so these are returned to the client as a result instead of being thrown.
+ */
+class ApplicationError extends Error {}
+
+/**
+ * Checks the Minecraft name given in an application against the user's profile.
+ * - verified profile name: the answer has to match it, otherwise the application is rejected
+ * - unverified profile name: the profile is updated to the given name (stays unverified)
+ */
+const syncApplicationMinecraftName = async (ssoId: string, answer: string) => {
+	let profileName: string | null = null
+	let verified = false
+	try {
+		const kcUser = await keycloakAdmin.users.findOne({ id: ssoId })
+		const verifiedAttr = kcUser?.attributes?.minecraftVerified
+		verified = Array.isArray(verifiedAttr)
+			? verifiedAttr[0] === 'true' || verifiedAttr[0] === true
+			: verifiedAttr === 'true' || verifiedAttr === true
+		const nameAttr = kcUser?.attributes?.minecraft
+		profileName = (Array.isArray(nameAttr) ? nameAttr[0] : nameAttr) || null
+	} catch (e) {
+		console.error('Failed to check Minecraft verification in applyToBuildTeam:', e)
+		throw new ApplicationError('Could not check your Minecraft account verification, please try again later')
+	}
+
+	if (verified && profileName) {
+		if (profileName.toLowerCase() !== answer.toLowerCase()) {
+			throw new ApplicationError(
+				`The Minecraft name you entered does not match your verified Minecraft account (${profileName}). Please use your verified name.`,
+			)
+		}
+		return
+	}
+
+	if (profileName !== answer) {
+		try {
+			await updateMinecraftProfile(answer)
+		} catch (e) {
+			throw new ApplicationError(e instanceof Error ? e.message : 'Could not update your Minecraft name')
+		}
+	}
+}
+
+const submitBuildTeamApplication = async (
+	data: { userId?: string; buildTeamSlug: string },
 	formData: FormData,
 ): Promise<void> => {
-	console.log(Object.fromEntries(formData))
-	console.log(data)
+	const session = await getSession()
+	if (!session) {
+		throw new ApplicationError('Unauthorized')
+	}
 
 	let buildteam = await prisma.buildTeam.findUnique({
 		where: { slug: data.buildTeamSlug },
@@ -978,24 +1054,54 @@ export const applyToBuildTeam = async (
 			acceptionMessage: true,
 			token: false,
 			allowApplications: true,
+			allowTrial: true,
 			webhook: true,
 		},
 	})
 
 	const user = await prisma.user.findUnique({
-		where: { ssoId: data.userId },
+		where: { ssoId: session.user.id },
 		select: { id: true, discordId: true, ssoId: true, username: true },
 	})
 
 	if (!buildteam) {
-		throw Error('Build Team not found')
+		throw new ApplicationError('Build Team not found')
 	}
 
 	if (!user) {
-		throw Error('User not found')
+		throw new ApplicationError('User not found')
 	}
 
-	// TODO: check if user is on BTE.net discord
+	let discordId = user.discordId
+	if (!discordId) {
+		try {
+			const kcUser = await keycloakAdmin.users.findOne({ id: session.user.id })
+			const discordIdentity = kcUser?.federatedIdentities?.find((fi: any) => fi.identityProvider === 'discord')
+			if (discordIdentity?.userId) {
+				discordId = discordIdentity.userId
+				user.discordId = discordId
+				await prisma.user.update({
+					where: { id: user.id },
+					data: { discordId },
+				})
+			}
+		} catch (e) {
+			console.error('Failed to check Discord identity in applyToBuildTeam:', e)
+		}
+	}
+
+	if (!discordId) {
+		throw new ApplicationError('You must connect your Discord account before applying to a Build Team')
+	}
+
+	if (!(await isOnBteDiscord(discordId))) {
+		throw new ApplicationError('Please join the BuildTheEarth.net Discord server before applying to a Build Team')
+	}
+
+	const trial = formData.get('trial') === 'true'
+	if (trial && !buildteam.allowTrial) {
+		throw new ApplicationError('This Build Team does not accept trial applications')
+	}
 
 	const pastApplications = await prisma.application.findMany({
 		where: { userId: user.id, buildteamId: buildteam.id },
@@ -1003,15 +1109,17 @@ export const applyToBuildTeam = async (
 	})
 
 	if (pastApplications[0]?.status === ApplicationStatus.ACCEPTED) {
-		throw Error('You have already been accepted to this Build Team in the past, you cannot apply again')
+		throw new ApplicationError('You have already been accepted to this Build Team in the past, you cannot apply again')
 	}
 
 	if (!buildteam.allowApplications) {
-		throw Error('This Build Team is not accepting applications at the moment')
+		throw new ApplicationError('This Build Team is not accepting applications at the moment')
 	}
 
-	if (pastApplications.some((app) => app.status === ApplicationStatus.SEND)) {
-		throw Error(
+	if (
+		pastApplications.some((app) => app.status === ApplicationStatus.SEND || app.status === ApplicationStatus.REVIEWING)
+	) {
+		throw new ApplicationError(
 			'You already have a pending application to this Build Team, please wait for it to be reviewed before applying again',
 		)
 	}
@@ -1029,6 +1137,12 @@ export const applyToBuildTeam = async (
 			},
 		})
 
+		// Same as accepting via review: the user becomes a member of the Build Team
+		await prisma.buildTeam.update({
+			where: { id: buildteam.id },
+			data: { members: { connect: { ssoId: user.ssoId } } },
+		})
+
 		await redisEventQueue.addJob(RedisEvent.SEND_DISCORD_DM, {
 			discordIds: [user.discordId!],
 			content: parseApplicationMessage(buildteam.acceptionMessage, application, user, buildteam),
@@ -1043,40 +1157,44 @@ export const applyToBuildTeam = async (
 		return
 	}
 
-	const validatedAnswers = []
+	const validatedAnswers: { id: string; answer: string }[] = []
+	let minecraftAnswer: string | null = null
 
 	for (const question of buildteam.applicationQuestions) {
-		// Filter by correct questions
-		if (question.trial == false) {
-			if (formData.has(question.id)) {
-				let answer: any = formData.get(question.id)
-				const type = question.type
+		// Only validate questions of the chosen application mode (builder / trial)
+		if (question.trial !== trial || question.sort < 0 || question.type === ApplicationQuestionType.TEXT) continue
 
-				if (typeof answer != 'string') {
-					if (typeof answer == 'number') {
-						answer = answer.toString()
-					} else {
-						try {
-							answer = JSON.stringify(answer)
-						} catch (e) {}
-					}
-				}
-				validatedAnswers.push({ id: question.id, answer: answer })
+		const raw = formData.get(question.id)
+		if (raw !== null && typeof raw !== 'string') {
+			throw new ApplicationError(`Invalid answer for "${question.title}"`)
+		}
+		const answer = (raw ?? '').trim()
 
-				// If Type is minecraft, populate the minecraft name of the user
-				// TODO: verify account
-				if (type == ApplicationQuestionType.MINECRAFT) {
-					// TODO: update minecraft account name / check if account name is the same as verified name
-				}
-			} else if (question.required && question.sort >= 0) {
-				throw Error('Required Questions are missing')
-			}
+		const error = validateAnswer(question, answer)
+		if (error) {
+			throw new ApplicationError(`${question.title}: ${error}`)
+		}
+
+		if (answer !== '') {
+			validatedAnswers.push({ id: question.id, answer })
+		}
+
+		if (question.type === ApplicationQuestionType.MINECRAFT && answer !== '') {
+			minecraftAnswer = answer
 		}
 	}
 
 	// Save answers
-	if (validatedAnswers.length <= 0) {
-		throw Error('No valid answers provided')
+	// Teams without questions for the chosen mode accept an application without answers
+	const hasQuestions = buildteam.applicationQuestions.some(
+		(q) => q.trial === trial && q.sort >= 0 && q.type !== ApplicationQuestionType.TEXT,
+	)
+	if (hasQuestions && validatedAnswers.length <= 0) {
+		throw new ApplicationError('Please answer at least one of the application questions')
+	}
+
+	if (minecraftAnswer) {
+		await syncApplicationMinecraftName(session.user.id, minecraftAnswer)
 	}
 	const application = await prisma.application.create({
 		data: {
@@ -1084,15 +1202,17 @@ export const applyToBuildTeam = async (
 			user: { connect: user },
 			status: ApplicationStatus.SEND,
 			createdAt: new Date(),
-			trial: false,
-			ApplicationAnswer: {
-				createMany: {
-					data: validatedAnswers.map((a) => ({
-						answer: a.answer,
-						questionId: a.id,
-					})),
+			trial,
+			...(validatedAnswers.length > 0 && {
+				ApplicationAnswer: {
+					createMany: {
+						data: validatedAnswers.map((a) => ({
+							answer: a.answer,
+							questionId: a.id,
+						})),
+					},
 				},
-			},
+			}),
 		},
 		include: {
 			reviewer: true,
@@ -1109,11 +1229,13 @@ export const applyToBuildTeam = async (
 		select: { user: { select: { id: true, discordId: true } } },
 	})
 
+	const dashboardUrl = (process.env.NEXTAUTH_URL || 'https://my.buildtheearth.net').replace(/\/$/, '')
+
 	await redisEventQueue.addJob(RedisEvent.SEND_DISCORD_DM, {
 		discordIds: reviewers.map((r) => r.user.discordId!),
 		content: {
 			title: `New Application for ${buildteam.name}`,
-			body: `A new application has been submitted for the Build Team \`${buildteam.name}\`.\n\n[Review Application](https://buildtheearth.net/team/${buildteam.slug}/applications/${application.id})`,
+			body: `A new application has been submitted for the Build Team \`${buildteam.name}\`.\n\n[Review Application](${dashboardUrl}/team/${buildteam.slug}/applications/${application.id})`,
 			emoji: 'INFORMATION',
 		},
 	})
@@ -1129,6 +1251,24 @@ export const applyToBuildTeam = async (
 
 	revalidatePath(`/team/${buildteam.slug}/applications`)
 	return
+}
+
+export type ApplyToBuildTeamResult = { error?: string }
+
+export const applyToBuildTeam = async (
+	data: { userId?: string; buildTeamSlug: string },
+	formData: FormData,
+): Promise<ApplyToBuildTeamResult> => {
+	try {
+		await submitBuildTeamApplication(data, formData)
+		return {}
+	} catch (e) {
+		if (e instanceof ApplicationError) {
+			return { error: e.message }
+		}
+		console.error('Failed to submit Build Team application:', e)
+		return { error: 'Something went wrong while sending your application. Please try again later.' }
+	}
 }
 
 export const saveBuildTeamApplicationQuestions = async ({ buildTeamSlug, questions }: any) => {
@@ -1237,6 +1377,60 @@ export const saveBuildTeamApplicationQuestions = async ({ buildTeamSlug, questio
 	return
 }
 
+export const editClaim = async (data: {
+	id: string
+	buildTeamSlug: string
+	name?: string
+	city?: string | null
+	description?: string | null
+	externalId?: string | null
+	active?: boolean
+	finished?: boolean
+}) => {
+	const session = await getSession()
+	if (!session) throw Error('Unauthorized')
+	const userId = session.user.id
+	if (!data.buildTeamSlug) {
+		throw Error('Missing build team context')
+	}
+
+	const hasPermission =
+		(await checkBuildTeamPermission(userId, {
+			slug: data.buildTeamSlug,
+			permission: 'team.claims.edit',
+		})) ||
+		(await checkBuildTeamPermission(userId, {
+			slug: data.buildTeamSlug,
+			permission: 'team.claim.list',
+		}))
+
+	if (!hasPermission) {
+		throw Error('You do not have permission to edit claims in this Build Team')
+	}
+
+	const { buildTeam: claimBuildTeam, ...claim } = await prisma.claim.update({
+		where: {
+			id: data.id,
+			buildTeam: { slug: data.buildTeamSlug },
+		},
+		include: { buildTeam: { select: { webhook: true } } },
+		data: {
+			name: data.name ?? undefined,
+			city: data.city || null,
+			description: data.description || null,
+			externalId: data.externalId || null,
+			active: data.active !== undefined ? Boolean(data.active) : undefined,
+			finished: data.finished !== undefined ? Boolean(data.finished) : undefined,
+		},
+	})
+
+	await sendClaimWebhook('CLAIM_UPDATE', claimBuildTeam?.webhook, claim)
+
+	revalidatePath(`/team/${data.buildTeamSlug}/claims`)
+	revalidatePath(`/team/${data.buildTeamSlug}/claims/${claim.id}`)
+	return claim
+}
+
 export const deleteClaim = async ({ removeId, buildTeamSlug }: { removeId: string; buildTeamSlug: string }) => {
 	const session = await getSession()
 	if (!session) throw Error('Unauthorized')
@@ -1245,21 +1439,73 @@ export const deleteClaim = async ({ removeId, buildTeamSlug }: { removeId: strin
 		throw Error('Missing build team context')
 	}
 
-	const hasPermission = await checkBuildTeamPermission(userId, {
-		slug: buildTeamSlug,
-		permission: 'team.claim.list',
-	})
+	const hasPermission =
+		(await checkBuildTeamPermission(userId, {
+			slug: buildTeamSlug,
+			permission: 'team.claims.edit',
+		})) ||
+		(await checkBuildTeamPermission(userId, {
+			slug: buildTeamSlug,
+			permission: 'team.claim.list',
+		}))
 
 	if (!hasPermission) {
 		throw Error('You do not have permission to delete claims from this Build Team')
 	}
 
-	const claim = await prisma.claim.delete({
+	const { buildTeam: claimBuildTeam, ...claim } = await prisma.claim.delete({
 		where: { buildTeam: { slug: buildTeamSlug }, id: removeId },
+		include: { buildTeam: { select: { webhook: true } } },
 	})
 
+	await sendClaimWebhook('CLAIM_DELETE', claimBuildTeam?.webhook, claim)
+
 	revalidatePath(`/team/${buildTeamSlug}/claims`)
-	redirect(`/team/${buildTeamSlug}/claims`)
+	return claim
+}
+
+/**
+ * Sends a BuildTeam webhook for a claim event, if the BuildTeam has a webhook configured.
+ * Failing to enqueue must never break the claim operation itself.
+ */
+async function sendClaimWebhook(
+	type: 'CLAIM_UPDATE' | 'CLAIM_DELETE',
+	webhook: string | null | undefined,
+	claim: Record<string, unknown>,
+) {
+	if (!webhook) return
+	try {
+		await redisEventQueue.addJob(RedisEvent.BUILDTEAM_WEBHOOK, {
+			type,
+			data: claim,
+			destination: [{ url: webhook }],
+		})
+	} catch (e) {
+		console.error(`Failed to enqueue ${type} webhook`, e)
+	}
+}
+
+/**
+ * Sends MEMBER_ADD / MEMBER_REMOVE BuildTeam webhooks (one per user), if the BuildTeam has a webhook configured.
+ * Failing to enqueue must never break the membership change itself.
+ */
+async function sendMemberWebhook(
+	type: 'MEMBER_ADD' | 'MEMBER_REMOVE',
+	buildTeam: { id: string; webhook: string | null },
+	users: Record<string, unknown>[],
+) {
+	if (!buildTeam.webhook) return
+	for (const user of users) {
+		try {
+			await redisEventQueue.addJob(RedisEvent.BUILDTEAM_WEBHOOK, {
+				type,
+				data: { ...user, buildTeamId: buildTeam.id },
+				destination: [{ url: buildTeam.webhook }],
+			})
+		} catch (e) {
+			console.error(`Failed to enqueue ${type} webhook`, e)
+		}
+	}
 }
 
 /**

@@ -43,6 +43,10 @@
 		"header": {
 			"cta": "Comezar",
 			"visit": "Visitar",
+			"dashboard": "Panel",
+			"account": "Conta",
+			"login": "Iniciar sesión",
+			"signup": "Rexistrarse",
 			"toggleNavigation": "Activar ligazóns de navegación"
 		},
 		"links": {
@@ -71,7 +75,7 @@
 			"image": {
 				"alt": "Rotonda nunha cidade francesa, imaxe de fondo."
 			},
-			"title": "Building The Earth In Minecraft",
+			"title": "Construíndo a Terra en Minecraft",
 			"cta": {
 				"label": "Únete a nós!",
 				"alt": "Únete á comunidade de BuildTheEarth"
@@ -125,6 +129,10 @@
 		"description": "A páxina que estás a tentar abrir non existe. Pode que escribises mal o enderezo, o que a páxina moveuse a outra dirección.",
 		"cta": "Voltar"
 	},
+	"error": {
+		"title": "Algo saíu mal",
+		"description": "Produciuse un erro inesperado ao cargar esta páxina. Téntao de novo máis tarde."
+	},
 	"teams": {
 		"seo": {
 			"title": "Equipos de construción",
@@ -140,7 +148,7 @@
 			"location": "Unha lista de países nas que constrúe cada equipo",
 			"members": "Número de membros neste equipo"
 		},
-		"memberCount": "{count, plural, =0 {no members} =1 {1 member} other {# members}}",
+		"memberCount": "{count, plural, =0 {sen membros} =1 {1 membro} other {# membros}}",
 		"ownPage": {
 			"seo": {
 				"notFoundTitle": "Non se atopou o equipo de construción.",
@@ -152,6 +160,7 @@
 			"overview": "Vista xeral",
 			"details": "Detalles",
 			"ip": "IP de Minecraft",
+			"discord": "Convite de Discord",
 			"version": "Versión de Minecraft",
 			"location": "{count, plural, =1 {Localización} other {Localizacións}}",
 			"moreLocations": "{list}, +{count}",
@@ -224,6 +233,16 @@
 		"content": {
 			"text": "BuildTheEarth está organizado en diferentes <b>equipos de construción</b>, cada un responsable de facer unha parte do noso globo. Estes equipos normalmente concéntranse en facer <b>países ou continentes</b>, permitíndoche contribuír a áreas que che apaixonan.<br></br><br></br>non hai límite no número de equipos de construción aos que podes unirte, así que síntete libre de explorar o que queiras!<br></br><br></br>Cada equipo de construción ten o seu propio servidor onde podes colaborar con outros construtores, participar en eventos, e conseguir apoio. Debido a esto, non hai unha soa forma de solicitar ser construtor \"proceso de solicitude\".<br></br>En cambio, simplemente <b>únete ao servidor de Discord</b> do equipo no que estés interesado e segue as súas propias construcións para comezar a colaborar.<br></br><br></br>Tamén podes unirte dende o servidor central (Minecraft: <ip>buildtheearth.net</ip>, <discord>Discord</discord>) para conseguir axuda e coñecer xente de outras partes da Terra"
 		},
+		"builderNotice": {
+			"builderTitle": "Contas para aspirantes a construtores",
+			"builderDescription": "As contas da plataforma están destinadas exclusivamente aos aspirantes a construtores que desexan reclamar terreos e construír cun equipo de construción. Non é necesario rexistrarse para explorar.",
+			"signUp": "Rexistrarse como construtor",
+			"logIn": "Iniciar sesión",
+			"visitorTitle": "Só explorando? Non se require conta",
+			"visitorDescription": "Non precisas unha conta para explorar! Descobre o noso mapa interactivo, explora os proxectos destacados ou únete aos nosos servidores como visitante.",
+			"exploreMap": "Explorar mapa",
+			"visitServers": "Visitar servidores"
+		},
 		"joinServer": {
 			"title": "Constúe en {country}",
 			"description": "Únete ao servidor de Minecraft {name} para axudar a construir esta rexión!<br></br><br></br>Non esquezas unirte ao servidor de Discord coas ligazóns de embaixo!",
@@ -254,7 +273,7 @@
 			"ctaMap": "Explora a páxina do mapa"
 		},
 		"joinServer": {
-			"title": "Explore {country}",
+			"title": "Explora {country}",
 			"description": "Únete ao servidor de Minecraft {name} para explorar lugares marabillosos desta rexión.<br></br><br></br>Se precisas axuda ao navegar nesta páxina, non dudes en acudir a nós en Discord!",
 			"ctaDiscord": "Únete ao servidor de Discord",
 			"ctaHub": "Servidor de Discord do Hub",
@@ -314,7 +333,7 @@
 		},
 		"cards": {
 			"claimCompletion": {
-				"title": "Claim Completion",
+				"title": "Completación de parcelas",
 				"description": "{finishedClaims} de {activeClaims} son as parcelas marcadas como rematadas."
 			},
 			"landCoverage": {
@@ -322,7 +341,7 @@
 				"description": "Progreso ({trackedAreaKm2} km²) da superficie terrestre."
 			},
 			"totalCoverage": {
-				"title": "Earth Total Area Coverage",
+				"title": "Cobertura total da superficie terrestre",
 				"description": "Progreso ({trackedAreaKm2} km²) da superficie total da Terra."
 			}
 		},
@@ -383,6 +402,72 @@
 		"readMore": "Ler máis"
 	},
 	"map": {
+		"controls": {
+			"hideLayer": "Agochar {layer}",
+			"showLayerFull": "Amosar {layer} (completo)",
+			"showLayerPartial": "Amosar {layer} (parcial)",
+			"showLayer": "Amosar {layer}",
+			"toggleLayer": "Alternar a capa de {layer}",
+			"layers": {
+				"heatmap": "mapa de calor",
+				"claims": "reclamacións"
+			},
+			"zoomIn": "Achegar",
+			"zoomOut": "Afastar",
+			"geolocate": "Amosar a miña localización",
+			"enterFullscreen": "Pantalla completa",
+			"exitFullscreen": "Saír da pantalla completa"
+		},
+		"claim": {
+			"size": "Tamaño",
+			"buildings": "Edificios",
+			"buildTeam": "BuildTeam",
+			"owner": "Propietario",
+			"builders": "Construtores",
+			"externallySynced": "A reclamación sincronízase externamente. Pode que falte información",
+			"imageAlt": "Imaxe {id} da reclamación",
+			"close": "Pechar",
+			"title": "Reclamación",
+			"unnamed": "Reclamación sen nome",
+			"loadError": "Non se puido cargar esta reclamación.",
+			"retry": "Tentar de novo",
+			"finished": "Rematada",
+			"inProgress": "En curso",
+			"synced": "Sincronizada",
+			"created": "Creada",
+			"noOwner": "Sen propietario",
+			"showAll": "Amosar todos ({count})",
+			"showLess": "Amosar menos",
+			"moreDetails": "Detalles",
+			"address": "Enderezo",
+			"copyLink": "Copiar ligazón",
+			"copyCoordinates": "Copiar coordenadas",
+			"openInGoogleMaps": "Abrir en Google Maps",
+			"copiedTitle": "Copiado",
+			"copiedMessage": "Pégao onde queiras.",
+			"openInOpenStreetMap": "Abrir en OpenStreetMap",
+			"openInAppleMaps": "Abrir en Apple Maps"
+		},
+		"contextMenu": {
+			"noCoordinates": "Sen coordenadas",
+			"copy": "Copiar",
+			"coordinates": "Coordenadas",
+			"blockCoordinates": "Coordenadas de bloque",
+			"chunkCoordinates": "Coordenadas de chunk",
+			"regionFile": "Nome do ficheiro de rexión",
+			"open": "Abrir",
+			"googleMaps": "Google Maps",
+			"bingMaps": "Bing Maps",
+			"openStreetMap": "OpenStreetMap",
+			"googleEarth": "Google Earth Web",
+			"copiedTitle": "Copiado",
+			"copiedMessage": "Pégao onde queiras."
+		},
+		"chooser": {
+			"title": "Varias reclamacións aquí",
+			"unnamed": "Reclamación sen nome",
+			"size": "{size} m²"
+		},
 		"seo": {
 			"title": "Mapa do proxecto",
 			"description": "Explora as parcelas activas e finalizadas de BuildTheEarth no mapa interactivo do mundo."

@@ -43,6 +43,10 @@
 		"header": {
 			"cta": "Zacznij",
 			"visit": "Zwiedzaj",
+			"dashboard": "Panel",
+			"account": "Konto",
+			"login": "Zaloguj się",
+			"signup": "Zarejestruj się",
 			"toggleNavigation": "Przełącz linki nawigacji"
 		},
 		"links": {
@@ -125,6 +129,10 @@
 		"description": "Strona, którą próbujesz otworzyć, nie istnieje. Być może błędnie wpisano adres lub strona została przeniesiona pod inny adres URL.",
 		"cta": "Wróć"
 	},
+	"error": {
+		"title": "Coś poszło nie tak",
+		"description": "Podczas ładowania tej strony wystąpił nieoczekiwany błąd. Spróbuj ponownie później."
+	},
 	"teams": {
 		"seo": {
 			"title": "Zespoły budowlane",
@@ -152,6 +160,7 @@
 			"overview": "Przegląd",
 			"details": "Szczegóły",
 			"ip": "IP Minecraft",
+			"discord": "Zaproszenie na Discord",
 			"version": "Wersja Minecraft",
 			"location": "{count, plural, =1 {Lokalizacja} other {Lokalizacje}}",
 			"moreLocations": "{list}, +{count}",
@@ -222,7 +231,17 @@
 		},
 		"searchCountries": "Szukaj krajów...",
 		"content": {
-			"text": "BuildTheEarth jest zorganizowane w wiele <b>zespołów budowlanych</b>, z których każdy odpowiada za odtwarzanie innych regionów świata. Zespoły często skupiają się na konkretnych <b>krajach lub kontynentach</b>, dzięki czemu możesz współtworzyć obszary, które są Ci bliskie.<br></br><br></br>Nie ma żadnych ograniczeń co do tego, do których i do ilu zespołów możesz dołączyć, więc śmiało dołączaj do tylu, ilu chcesz!<br></br><br></br>Każdy zespół ma własny serwer, na którym możesz współpracować z innymi budowniczymi, brać udział w wydarzeniach i otrzymywać wsparcie. Z tego powodu nie ma jednego „procesu aplikacyjnego”.<br></br>Zamiast tego po prostu <b>dołącz do serwera Discord</b> zespołu, który Cię interesuje, i postępuj zgodnie z jego prostymi instrukcjami, aby zacząć.<br></br><br></br>Możesz też dołączyć do naszego serwera Hub (Minecraft: <ip>buildtheearth.net</ip>, <discord>Discord</discord>), aby uzyskać pomoc i poznać innych budowniczych z całego świata!"
+			"text": "BuildTheEarth jest zorganizowane w wiele <b>zespołów budowlanych</b>, z których każdy odpowiada za odtwarzanie innych regionów świata. Zespoły często skupiają się na konkretnych <b>krajach lub kontynentach</b>, dzięki czemu możesz współtworzyć obszary, które są Ci bliskie.<br></br><br></br>Nie ma żadnych ograniczeń co do tego, do których i do ilu zespołów możesz dołączyć, więc śmiało dołączaj do tylu, ilu chcesz!<br></br><br></br>Każdy zespół ma własny serwer, na którym możesz współpracować z innymi budowniczymi, brać udział w wydarzeniach i otrzymywać wsparcie. Z tego powodu nie ma jednego „procesu aplikacyjnego”.<br></br>Zamiast tego po prostu <b>dołącz do serwera Discord</b> zespołu, który Cię interesuje, i postępuj zgodnie z jego prostymi instrukcjami, aby zacząć.<br></br><br></br>Możesz też dołączyć do naszego serwera Hub (Minecraft: <ip>buildtheearth.net</ip>, <discord>Discord</discord>) aby uzyskać pomoc i poznać innych budowniczych z całego świata!"
+		},
+		"builderNotice": {
+			"builderTitle": "Konta dla przyszłych budowniczych",
+			"builderDescription": "Konta na platformie są przeznaczone wyłącznie dla osób, które chcą zgłaszać działki i budować w zespole budowlanym. Rejestracja nie jest wymagana do przeglądania.",
+			"signUp": "Zarejestruj się jako budowniczy",
+			"logIn": "Zaloguj się",
+			"visitorTitle": "Chcesz tylko pozwiedzać? Konto nie jest wymagane",
+			"visitorDescription": "Nie potrzebujesz konta, aby zwiedzać! Odkryj naszą interaktywną mapę, przeglądaj wyróżnione budowle lub dołącz do naszych serwerów jako gość.",
+			"exploreMap": "Odkryj mapę",
+			"visitServers": "Odwiedź serwery"
 		},
 		"joinServer": {
 			"title": "Buduj w {country}",
@@ -383,6 +402,72 @@
 		"readMore": "Czytaj więcej"
 	},
 	"map": {
+		"controls": {
+			"hideLayer": "Ukryj: {layer}",
+			"showLayerFull": "Pokaż: {layer} (pełne)",
+			"showLayerPartial": "Pokaż: {layer} (częściowo)",
+			"showLayer": "Pokaż: {layer}",
+			"toggleLayer": "Przełącz warstwę: {layer}",
+			"layers": {
+				"heatmap": "mapa cieplna",
+				"claims": "claimy"
+			},
+			"zoomIn": "Przybliż",
+			"zoomOut": "Oddal",
+			"geolocate": "Pokaż moją lokalizację",
+			"enterFullscreen": "Pełny ekran",
+			"exitFullscreen": "Zamknij pełny ekran"
+		},
+		"claim": {
+			"size": "Rozmiar",
+			"buildings": "Budynki",
+			"buildTeam": "BuildTeam",
+			"owner": "Właściciel",
+			"builders": "Budowniczowie",
+			"externallySynced": "Claim jest synchronizowany zewnętrznie. Niektóre informacje mogą być niedostępne",
+			"imageAlt": "Obraz {id} claima",
+			"close": "Zamknij",
+			"title": "Claim",
+			"unnamed": "Claim bez nazwy",
+			"loadError": "Nie udało się wczytać tego claima.",
+			"retry": "Spróbuj ponownie",
+			"finished": "Ukończony",
+			"inProgress": "W trakcie",
+			"synced": "Zsynchronizowany",
+			"created": "Utworzono",
+			"noOwner": "Brak właściciela",
+			"showAll": "Pokaż wszystkich ({count})",
+			"showLess": "Pokaż mniej",
+			"moreDetails": "Szczegóły",
+			"address": "Adres",
+			"copyLink": "Kopiuj link",
+			"copyCoordinates": "Kopiuj współrzędne",
+			"openInGoogleMaps": "Otwórz w Mapach Google",
+			"copiedTitle": "Skopiowano",
+			"copiedMessage": "Wklej to gdziekolwiek.",
+			"openInOpenStreetMap": "Otwórz w OpenStreetMap",
+			"openInAppleMaps": "Otwórz w Mapach Apple"
+		},
+		"contextMenu": {
+			"noCoordinates": "Brak współrzędnych",
+			"copy": "Kopiuj",
+			"coordinates": "Współrzędne",
+			"blockCoordinates": "Współrzędne bloku",
+			"chunkCoordinates": "Współrzędne chunka",
+			"regionFile": "Nazwa pliku regionu",
+			"open": "Otwórz",
+			"googleMaps": "Google Maps",
+			"bingMaps": "Bing Maps",
+			"openStreetMap": "OpenStreetMap",
+			"googleEarth": "Google Earth Web",
+			"copiedTitle": "Skopiowano",
+			"copiedMessage": "Wklej to gdziekolwiek."
+		},
+		"chooser": {
+			"title": "Wiele claimów w tym miejscu",
+			"unnamed": "Claim bez nazwy",
+			"size": "{size} m²"
+		},
 		"seo": {
 			"title": "Mapa projektu",
 			"description": "Przeglądaj aktywne i ukończone działki BuildTheEarth na interaktywnej mapie świata."

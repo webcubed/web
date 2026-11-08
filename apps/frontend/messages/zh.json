@@ -32,6 +32,10 @@
 		"header": {
 			"cta": "開始使用",
 			"visit": "參觀",
+			"dashboard": "儀表板",
+			"account": "帳號",
+			"login": "登入",
+			"signup": "註冊",
 			"toggleNavigation": "切換導覽連結"
 		},
 		"links": {
@@ -114,6 +118,10 @@
 		"description": "您嘗試開啟的頁面不存在。您可能打錯網址，或者該頁面已移至其他網址。",
 		"cta": "返回"
 	},
+	"error": {
+		"title": "發生錯誤",
+		"description": "載入此頁面時發生未預期的錯誤，請稍後再試。"
+	},
 	"teams": {
 		"seo": {
 			"title": "建築團隊",
@@ -141,6 +149,7 @@
 			"overview": "簡介",
 			"details": "詳情",
 			"ip": "Minecraft IP",
+			"discord": "Discord 邀請",
 			"version": "Minecraft 版本",
 			"location": "{count, plural, =1 {個地點} other {個地點}}",
 			"moreLocations": "{list}, +{count}",
@@ -212,6 +221,16 @@
 		"searchCountries": "搜尋國家...",
 		"content": {
 			"text": "BuildTheEarth 由多個<b>建築團隊</b>組成，每個團隊負責重現世界的不同地區。建築團隊通常專注於特定的<b>國家或大陸</b>，您能夠為您熱愛的地區做出貢獻。<br></br><br></br>沒有限制您可以加入哪個或多少個建築團隊，因此請隨意探索！<br></br><br></br>每個建築團隊都有各自的伺服器，讓您可以與其他建築師合作、參與活動並獲得支援。因此，並沒有單一的「申請流程」。<br></br>而是需要加入您感興趣的建築團隊的<b> Discord 伺服器</b>，依照他們的指示即可輕鬆開始。<br></br><br></br>您也可以加入我們的中樞伺服器 (Minecraft: <ip>buildtheearth.net</ip>, <discord>Discord</discord>) 以獲得協助並結識來自世界各地的其他建築師！"
+		},
+		"builderNotice": {
+			"builderTitle": "建築師專用帳號",
+			"builderDescription": "平台帳號專為希望認領地塊並加入建築團隊的建築師設計。純粹探索與參觀無需註冊。",
+			"signUp": "註冊為建築師",
+			"logIn": "登入",
+			"visitorTitle": "僅想參觀？無需帳號",
+			"visitorDescription": "您無需帳號即可自由探索！瀏覽我們的互動地圖、欣賞精選建築，或以訪客身分加入伺服器。",
+			"exploreMap": "探索地圖",
+			"visitServers": "參觀伺服器"
 		},
 		"joinServer": {
 			"title": "在 {country} 建設",
@@ -372,6 +391,72 @@
 		"readMore": "閱讀更多"
 	},
 	"map": {
+		"controls": {
+			"hideLayer": "隱藏{layer}",
+			"showLayerFull": "顯示{layer}（完整）",
+			"showLayerPartial": "顯示{layer}（部分）",
+			"showLayer": "顯示{layer}",
+			"toggleLayer": "切換{layer}圖層",
+			"layers": {
+				"heatmap": "熱力圖",
+				"claims": "建案範圍"
+			},
+			"zoomIn": "放大",
+			"zoomOut": "縮小",
+			"geolocate": "顯示我的位置",
+			"enterFullscreen": "進入全螢幕",
+			"exitFullscreen": "離開全螢幕"
+		},
+		"claim": {
+			"size": "面積",
+			"buildings": "建築數量",
+			"buildTeam": "建築團隊",
+			"owner": "擁有者",
+			"builders": "建築師",
+			"externallySynced": "此建案為外部同步，部分資訊可能無法顯示",
+			"imageAlt": "建案圖片 {id}",
+			"close": "關閉",
+			"title": "建案",
+			"unnamed": "未命名建案",
+			"loadError": "無法載入此建案。",
+			"retry": "重試",
+			"finished": "已完成",
+			"inProgress": "進行中",
+			"synced": "已同步",
+			"created": "建立日期",
+			"noOwner": "沒有擁有者",
+			"showAll": "顯示全部（{count}）",
+			"showLess": "顯示較少",
+			"moreDetails": "詳細資訊",
+			"address": "地址",
+			"copyLink": "複製連結",
+			"copyCoordinates": "複製座標",
+			"openInGoogleMaps": "在 Google 地圖中開啟",
+			"copiedTitle": "已複製",
+			"copiedMessage": "可貼到任何地方。",
+			"openInOpenStreetMap": "在 OpenStreetMap 中開啟",
+			"openInAppleMaps": "在 Apple 地圖中開啟"
+		},
+		"contextMenu": {
+			"noCoordinates": "沒有座標",
+			"copy": "複製",
+			"coordinates": "座標",
+			"blockCoordinates": "方塊座標",
+			"chunkCoordinates": "區塊座標",
+			"regionFile": "區域檔案名稱",
+			"open": "開啟",
+			"googleMaps": "Google Maps",
+			"bingMaps": "Bing Maps",
+			"openStreetMap": "OpenStreetMap",
+			"googleEarth": "Google Earth Web",
+			"copiedTitle": "已複製",
+			"copiedMessage": "可貼到任何地方。"
+		},
+		"chooser": {
+			"title": "此處有多個建案",
+			"unnamed": "未命名建案",
+			"size": "{size} m²"
+		},
 		"seo": {
 			"title": "專案地圖",
 			"description": "在互動式世界地圖上探索 BuildTheEarth 進行中和已完成的建案。"

@@ -1,7 +1,7 @@
 import Wrapper from '@/components/layout/Wrapper'
 import prisma from '@/util/db'
 import directus from '@/util/directus'
-import { getLanguageAlternates } from '@/util/seo'
+import { getLanguageAlternates, getLocalizedUrl } from '@/util/seo'
 import { readItems } from '@directus/sdk'
 import { Text, Title, Box, Stack, Grid, GridCol, Image, Flex } from '@mantine/core'
 import { IconChevronRight, IconCornerRightUp } from '@tabler/icons-react'
@@ -10,6 +10,7 @@ import { Locale } from 'next-intl'
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server'
 import LinkButton from '@/components/core/LinkButton'
 import AppearAnimation from '@/components/animations/AppearAnimation'
+import { SafeHtml } from '@repo/shared'
 
 export const dynamic = 'force-static'
 export const revalidate = 86400 // 24h
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 		title: t('title'),
 		description: t('description'),
 		alternates: {
+			canonical: getLocalizedUrl(locale, '/about-us'),
 			languages: getLanguageAlternates('/about-us'),
 		},
 	}
@@ -97,12 +99,9 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 									{formatDate(item.date, item.date_display, formatter)}
 								</Text>
 
-								<Text
-									maw="100%"
-									component="div"
-									style={{ lineHeight: 1.6 }}
-									dangerouslySetInnerHTML={{ __html: item.content }}
-								/>
+								<Text maw="100%" component="div" style={{ lineHeight: 1.6 }}>
+									<SafeHtml html={item.content} />
+								</Text>
 
 								{item.link && (
 									<LinkButton
@@ -146,7 +145,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 					) : null
 
 					return (
-						<Grid key={item.id} w="100%" align="center" gutter={60}>
+						<Grid key={item.id} w="100%" align="center" gap={60}>
 							{isEven ? [textCol, imageCol] : [imageCol, textCol]}
 						</Grid>
 					)

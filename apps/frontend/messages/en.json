@@ -43,6 +43,10 @@
 		"header": {
 			"cta": "Get Started",
 			"visit": "Visit",
+			"dashboard": "Dashboard",
+			"account": "Account",
+			"login": "Log In",
+			"signup": "Sign Up",
 			"toggleNavigation": "Toggle navigation links"
 		},
 		"links": {
@@ -125,6 +129,10 @@
 		"description": "The page you are trying to open does not exist. You may have mistyped the address, or the page has been moved to another URL.",
 		"cta": "Go back"
 	},
+	"error": {
+		"title": "Something went wrong",
+		"description": "An unexpected error occurred while loading this page. Please try again later."
+	},
 	"teams": {
 		"seo": {
 			"title": "Build Teams",
@@ -152,6 +160,7 @@
 			"overview": "Overview",
 			"details": "Details",
 			"ip": "Minecraft IP",
+			"discord": "Discord Invite",
 			"version": "Minecraft Version",
 			"location": "{count, plural, =1 {Location} other {Locations}}",
 			"moreLocations": "{list}, +{count}",
@@ -223,6 +232,16 @@
 		"searchCountries": "Search Countries...",
 		"content": {
 			"text": "BuildTheEarth is organized into multiple <b>Build Teams</b>, each responsible for recreating different regions of the world. Build Teams often focus on specific <b>countries or continents</b>, allowing you to contribute to areas you are passionate about.<br></br><br></br>There are no restrictions on which or how many Build Teams you can join, so feel free to explore how many as you like!<br></br><br></br>Each Build Team has its own server where you can collaborate with other builders, participate in events, and get support. Due to this, there is no single \"application process\".<br></br>Instead, simply <b>join the Discord server</b> of the Build Team you are interested in and follow their simple instructions to get started.<br></br><br></br>You can also join our Hub Server (Minecraft: <ip>buildtheearth.net</ip>, <discord>Discord</discord>) to get help and meet other builders from around the world!"
+		},
+		"builderNotice": {
+			"builderTitle": "Accounts for upcoming Builders",
+			"builderDescription": "Accounts are intended for upcoming builders who want to claim land and build with a Build Team. Registration is not required to explore.",
+			"signUp": "Sign Up as Builder",
+			"logIn": "Log In",
+			"visitorTitle": "Just Exploring? No Account Required",
+			"visitorDescription": "You do not need an account to explore! Discover our interactive map, browse community showcases, or join our servers as a visitor.",
+			"exploreMap": "Explore Map",
+			"visitServers": "Visit Servers"
 		},
 		"joinServer": {
 			"title": "Build in {country}",
@@ -383,6 +402,72 @@
 		"readMore": "Read more"
 	},
 	"map": {
+		"controls": {
+			"hideLayer": "Hide {layer}",
+			"showLayerFull": "Show {layer} (full)",
+			"showLayerPartial": "Show {layer} (partial)",
+			"showLayer": "Show {layer}",
+			"toggleLayer": "Toggle {layer} layer",
+			"layers": {
+				"heatmap": "heatmap",
+				"claims": "claims"
+			},
+			"zoomIn": "Zoom in",
+			"zoomOut": "Zoom out",
+			"geolocate": "Show my location",
+			"enterFullscreen": "Enter fullscreen",
+			"exitFullscreen": "Exit fullscreen"
+		},
+		"claim": {
+			"size": "Size",
+			"buildings": "Buildings",
+			"buildTeam": "BuildTeam",
+			"owner": "Owner",
+			"builders": "Builders",
+			"externallySynced": "Claim is externally synced. Some information might not be available",
+			"imageAlt": "Image {id} for claim",
+			"close": "Close",
+			"title": "Claim",
+			"unnamed": "Unnamed claim",
+			"loadError": "This claim could not be loaded.",
+			"retry": "Try again",
+			"finished": "Finished",
+			"inProgress": "In progress",
+			"synced": "Synced",
+			"created": "Created",
+			"noOwner": "No owner",
+			"showAll": "Show all ({count})",
+			"showLess": "Show less",
+			"moreDetails": "Details",
+			"address": "Address",
+			"copyLink": "Copy link",
+			"copyCoordinates": "Copy coordinates",
+			"openInGoogleMaps": "Open in Google Maps",
+			"copiedTitle": "Copied",
+			"copiedMessage": "Paste it anywhere.",
+			"openInOpenStreetMap": "Open in OpenStreetMap",
+			"openInAppleMaps": "Open in Apple Maps"
+		},
+		"contextMenu": {
+			"noCoordinates": "No coordinates",
+			"copy": "Copy",
+			"coordinates": "Coordinates",
+			"blockCoordinates": "Block coordinates",
+			"chunkCoordinates": "Chunk coordinates",
+			"regionFile": "Region file name",
+			"open": "Open",
+			"googleMaps": "Google Maps",
+			"bingMaps": "Bing Maps",
+			"openStreetMap": "OpenStreetMap",
+			"googleEarth": "Google Earth Web",
+			"copiedTitle": "Copied",
+			"copiedMessage": "Paste it anywhere."
+		},
+		"chooser": {
+			"title": "Multiple claims here",
+			"unnamed": "Unnamed claim",
+			"size": "{size} m²"
+		},
 		"seo": {
 			"title": "Project Map",
 			"description": "Explore active and finished BuildTheEarth claims on the interactive world map."

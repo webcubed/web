@@ -1,4 +1,4 @@
-import { ApplicationStatus } from '@prisma/client'
+import { ApplicationStatus } from '@repo/db'
 import Core from '../Core.js'
 
 export async function middlewareUploadSrc(params, next) {
@@ -75,9 +75,7 @@ export async function applicationReminder(core: Core) {
 						year: 'numeric',
 						month: 'numeric',
 						day: 'numeric',
-					})}: <@${app.user.discordId}> (${app.user.minecraft}) Review it [here](${process.env.FRONTEND_URL}/teams/${
-						app.buildteam.slug
-					}/manage/review/${app.id})`,
+					})}: <@${app.user.discordId}> (${app.user.minecraft}) Review it [here](https://my.buildtheearth.net/team/${app.buildteam.slug}/applications/${app.id})`,
 			)
 			core.getDiscord().sendBotMessage(
 				`**Application reminder for ${

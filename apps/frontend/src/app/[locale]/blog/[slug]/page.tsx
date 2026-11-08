@@ -1,7 +1,7 @@
 import Wrapper from '@/components/layout/Wrapper'
 import styles from '@/styles/Blog.module.css'
 import directus from '@/util/directus'
-import { getLanguageAlternates } from '@/util/seo'
+import { getLanguageAlternates, getLocalizedUrl } from '@/util/seo'
 import { readItem, readItems } from '@directus/sdk'
 import { Box, Group, Text, Tooltip } from '@mantine/core'
 import { IconCalendar } from '@tabler/icons-react'
@@ -9,6 +9,7 @@ import { Metadata } from 'next'
 import { Locale } from 'next-intl'
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { SafeHtml } from '@repo/shared'
 export const dynamic = 'force-static'
 export const revalidate = 86400 // 24h minutes
 
@@ -55,6 +56,7 @@ export async function generateMetadata({
 		description: post.summary,
 		authors: [{ name: post.user_created.display_name || 'BuildTheEarth' }],
 		alternates: {
+			canonical: getLocalizedUrl(locale, `/blog/${slug}`),
 			languages: getLanguageAlternates(`/blog/${slug}`),
 		},
 		openGraph: { images: [ogImage] },
@@ -70,7 +72,9 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 
 	return (
 		<Wrapper offsetHeader={false} head={{ title: post.title, src: `${directus.url}assets/${post.hero_image}` }}>
-			<Box dangerouslySetInnerHTML={{ __html: post.content }} className={styles.blogContent} />
+			<Box className={styles.blogContent}>
+				<SafeHtml html={post.content} />
+			</Box>
 
 			<Group wrap="nowrap" gap={10} mt="xs" mb="md" justify="flex-end">
 				<Tooltip label={'Published on ' + formatter.dateTime(new Date(post.published_at), { dateStyle: 'medium' })}>

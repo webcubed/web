@@ -26,6 +26,7 @@ import { removeMember } from '@/actions/buildTeams'
 import { ApplicationStatusBadge } from '@/components/data/ApplicationStatusBadge'
 import { UserDisplay } from '@/components/data/User'
 import { useActiveBuildTeam } from '@/hooks/useBuildTeamData'
+import { ACTION_COLORS } from '@/util/actions'
 import { toHumanDate } from '@/util/date'
 import { useClipboard } from '@mantine/hooks'
 import { closeAllModals, openConfirmModal, openModal } from '@mantine/modals'
@@ -34,6 +35,7 @@ import type { ApplicationStatus } from '@repo/db'
 import { DataTable } from 'mantine-datatable'
 import moment from 'moment'
 import Link from 'next/link'
+import LinkButton from '@/components/core/LinkButton'
 
 export default function ApplicationsDatatable({
 	applications,
@@ -70,6 +72,7 @@ export default function ApplicationsDatatable({
 	const page = Number(params.get('page')) || 1
 	const clipboard = useClipboard({ timeout: 500 })
 	const activeBuildTeam = useActiveBuildTeam()
+	const teamSlug = slug || activeBuildTeam?.slug
 
 	return (
 		<DataTable
@@ -96,7 +99,22 @@ export default function ApplicationsDatatable({
 				{
 					accessor: 'reviewedAt',
 					title: 'Reviewed',
-					render: ({ reviewedAt }) => (reviewedAt ? toHumanDate(reviewedAt) : '-/-'),
+					render: ({ reviewedAt, id }) =>
+						reviewedAt ? (
+							toHumanDate(reviewedAt)
+						) : (
+							<LinkButton
+								size="xs"
+								variant="light"
+								color="cyan"
+								aria-label="Review"
+								disabled={!permissions?.includes('team.application.review')}
+								href={`/team/${teamSlug}/applications/${id}`}
+								rel="noopener"
+							>
+								Review
+							</LinkButton>
+						),
 				},
 				{
 					accessor: '',
@@ -111,7 +129,7 @@ export default function ApplicationsDatatable({
 								aria-label="View Details"
 								component={Link}
 								disabled={!permissions?.includes('team.application.review')}
-								href={`/team/${activeBuildTeam?.slug}/applications/${application.id}`}
+								href={`/team/${teamSlug}/applications/${application.id}`}
 								rel="noopener"
 							>
 								<IconEye size={16} />
@@ -126,14 +144,15 @@ export default function ApplicationsDatatable({
 									<MenuItem
 										leftSection={<IconEye style={{ width: rem(14), height: rem(14) }} />}
 										aria-label="Open Details"
-										color="cyan"
+										color={ACTION_COLORS.view}
 										component={Link}
 										disabled={!permissions?.includes('team.application.review')}
-										href={`/team/${activeBuildTeam?.slug}/applications/${application.id}`}
+										href={`/team/${teamSlug}/applications/${application.id}`}
 										target="_blank"
 									>
 										Open Details
 									</MenuItem>
+									<MenuDivider />
 									<MenuItem
 										leftSection={<IconId style={{ width: rem(14), height: rem(14) }} />}
 										aria-label="Copy ID"
@@ -141,6 +160,15 @@ export default function ApplicationsDatatable({
 									>
 										Copy ID
 									</MenuItem>
+									{application.user?.ssoId && (
+										<MenuItem
+											leftSection={<IconId style={{ width: rem(14), height: rem(14) }} />}
+											aria-label="Copy SSO ID"
+											onClick={() => clipboard.copy(application.user.ssoId)}
+										>
+											Copy SSO ID
+										</MenuItem>
+									)}
 								</MenuDropdown>
 							</Menu>
 						</Group>

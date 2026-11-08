@@ -6,7 +6,7 @@ import LinkButton from '@/components/core/LinkButton'
 import { Protection } from '@/components/Protection'
 import { getSession, hasRole } from '@/util/auth'
 import prisma from '@/util/db'
-import { IconExternalLink } from '@tabler/icons-react'
+import { IconExternalLink, IconPlus } from '@tabler/icons-react'
 import { Metadata } from 'next'
 import ClaimsDatatable from './datatable'
 import { SearchClaims } from './interactivity'
@@ -41,6 +41,9 @@ export default async function Page({
 	if (hasRole(session, 'edit-claims') || hasRole(session, 'review-claims') || hasRole(session, 'get-claims')) {
 		if (!activePermissions.includes('team.claims.edit')) {
 			activePermissions.push('team.claims.edit')
+		}
+		if (!activePermissions.includes('team.claim.list')) {
+			activePermissions.push('team.claim.list')
 		}
 	}
 
@@ -97,11 +100,14 @@ export default async function Page({
 	}
 
 	return (
-		<Protection requiredRole="get-claims">
+		<Protection requiredBuildTeam={{ permission: 'team.claim.list', slug }}>
 			<ContentWrapper maw="90vw">
 				<Group justify="space-between" w="100%" mt="xl" mb="md">
 					<Title order={1}>Claims</Title>
 					<Group gap="xs">
+						<LinkButton color="green" href="/claims/editor" leftSection={<IconPlus size={14} />}>
+							Create Claim
+						</LinkButton>
 						<LinkButton
 							variant="light"
 							color="cyan"

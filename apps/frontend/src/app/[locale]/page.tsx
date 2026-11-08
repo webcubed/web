@@ -1,20 +1,19 @@
 import AppearAnimation from '@/components/animations/AppearAnimation'
 import LottieAnimation from '@/components/animations/LottieAnimation'
 import SplitTextAnimation from '@/components/animations/SplitText'
+import Link from '@/components/core/Link'
 import LinkButton from '@/components/core/LinkButton'
 import { OutreachArticle, OutreachArticleCard } from '@/components/data/OutreachArticle'
 import Wrapper from '@/components/layout/Wrapper'
-import Link from '@/components/core/Link'
 import chevronBounceLottie from '@/public/animations/chevron-bounce.json'
 import prisma from '@/util/db'
 import directus from '@/util/directus'
-import { getLanguageAlternates } from '@/util/seo'
+import { getLanguageAlternates, getLocalizedUrl } from '@/util/seo'
 import { readItems } from '@directus/sdk'
 import { Carousel, CarouselSlide } from '@mantine/carousel'
 import {
 	BackgroundImage,
 	Box,
-	Button,
 	Center,
 	Container,
 	Flex,
@@ -22,6 +21,7 @@ import {
 	GridCol,
 	Group,
 	Image,
+	ScrollArea,
 	SimpleGrid,
 	Space,
 	Stepper,
@@ -57,6 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 		title: t('title'),
 		description: t('description'),
 		alternates: {
+			canonical: getLocalizedUrl(locale, '/'),
 			languages: getLanguageAlternates('/'),
 		},
 	}
@@ -68,7 +69,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 	const t = await getTranslations('home')
 	const formatter = await getFormatter()
 
-	const [buildingsAgg, finishedAreasAgg, communityMembers] = await prisma.$transaction([
+	const [buildingsAgg, finishedAreasAgg, communityMembers] = await Promise.all([
 		prisma.claim.aggregate({
 			_sum: { buildings: true },
 			where: { active: true },
@@ -99,6 +100,10 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 	const outreachArticles: OutreachArticle[] = (await directus.request(
 		readItems('outreach', { limit: 4, sort: '-date', fields: ['*'] }),
 	)) as unknown as OutreachArticle[]
+
+	const referenceCompanies: { name: string; sort: number; link: string; icon: string }[] = (await directus.request(
+		readItems('references', { limit: 4, fields: ['*'] }),
+	)) as unknown as { name: string; sort: number; link: string; icon: string }[]
 
 	return (
 		<Wrapper offsetHeader={false} padded={false}>
@@ -174,10 +179,77 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 					<LottieAnimation animationData={chevronBounceLottie} loop={true} style={{ height: '54px' }} />
 				</motion.a>
 			</BackgroundImage>
-			<div style={{ width: '100%' }} id="more" role="main">
+			<div style={{ width: '100%', scrollMarginTop: '56px' }} id="more" role="main">
+				<Box
+					pt="calc(var(--mantine-spacing-xl) * 1)"
+					pb="calc(var(--mantine-spacing-xl) * 1)"
+					style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}
+				>
+					<Container size="responsive">
+						{referenceCompanies.length > 0 && (
+							<Center hiddenFrom="sm">
+								<Link
+									href={referenceCompanies[0].link}
+									target="_blank"
+									aria-label={referenceCompanies[0].name + "'s website"}
+									style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+								>
+									<Image
+										src={`${directus.url}assets/${referenceCompanies[0].icon}?height=100&width=350&fit=inside`}
+										alt={referenceCompanies[0].name + "'s logo"}
+										h={80}
+										w="auto"
+										maw={{ base: 280, md: 350 }}
+										fit="contain"
+									/>
+								</Link>
+							</Center>
+						)}
+						<ScrollArea
+							visibleFrom="sm"
+							type="hover"
+							scrollbars="x"
+							style={{
+								WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 64px), transparent 100%)',
+								maskImage: 'linear-gradient(to right, black calc(100% - 64px), transparent 100%)',
+							}}
+						>
+							<Flex
+								justify="center"
+								align="center"
+								gap={'calc(var(--mantine-spacing-xl) * 2.5)'}
+								wrap="nowrap"
+								w="max-content"
+								m="auto"
+								pl="md"
+								pr={64}
+								pb="xs"
+							>
+								{referenceCompanies.map((company) => (
+									<Link
+										key={company.name}
+										href={company.link}
+										target="_blank"
+										aria-label={company.name + "'s website"}
+										style={{ flexShrink: 0 }}
+									>
+										<Image
+											src={`${directus.url}assets/${company.icon}?height=100&width=350&fit=inside`}
+											alt={company.name + "'s logo"}
+											h={80}
+											w="auto"
+											maw={{ base: 280, md: 350 }}
+											fit="contain"
+										/>
+									</Link>
+								))}
+							</Flex>
+						</ScrollArea>
+					</Container>
+				</Box>
 				<Container
 					style={{ border: 'var(--debug-border) solid red' }}
-					my="calc(var(--mantine-spacing-xl) * 5)"
+					my="calc(var(--mantine-spacing-xl) * 3.5)"
 					size="responsive"
 				>
 					<Grid w="100%" styles={{ col: { border: 'var(--debug-border) solid green' } }}>

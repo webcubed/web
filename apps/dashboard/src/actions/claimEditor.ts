@@ -1,11 +1,106 @@
 'use server'
 
 import { constructClaimGeoJSONQuery } from '@/app/(sideNavbar)/api/data/claims.geojson/query'
-import { getSession } from '@/util/auth'
+import { getSession, hasRole } from '@/util/auth'
+import turf, { toPolygon } from '@/util/coordinates'
 import prisma from '@/util/db'
+import { deleteImage, putImage, readImage } from '@/util/uploads'
 import { Prisma } from '@repo/db'
 import redisEventQueue, { RedisEvent } from '@repo/shared/utils/redis'
+import { randomBytes } from 'crypto'
 import { revalidatePath } from 'next/cache'
+import { checkBuildTeamPermission } from './getUser'
+
+/**
+ * Bounding box center of an area in "lng, lat" format, matching the SYNC_CLAIM_OSM worker task.
+ * Set directly so a claim shows up on the map (which requires a center) without waiting for the worker.
+ */
+const calculateCenter = (area: string[]): string | undefined => {
+	const points = area.map((p) => p.split(', ').map(Number)).filter((p) => p.length >= 2 && !p.some(isNaN))
+	if (points.length === 0) return undefined
+	const lngs = points.map((p) => p[0])
+	const lats = points.map((p) => p[1])
+	return `${(Math.min(...lngs) + Math.max(...lngs)) / 2}, ${(Math.min(...lats) + Math.max(...lats)) / 2}`
+}
+
+export const getClaimEditorPermissions = async (): Promise<{
+	userId: string
+	isAdmin: boolean
+	editableBuildTeamIds: string[]
+}> => {
+	const session = await getSession()
+	if (!session) throw new Error('Unauthorized')
+	const userId = session.user.id
+
+	const isAdmin = hasRole(session, 'edit-claims') || hasRole(session, 'review-claims')
+
+	if (isAdmin) {
+		const allTeams = await prisma.buildTeam.findMany({ select: { id: true } })
+		return {
+			userId,
+			isAdmin: true,
+			editableBuildTeamIds: allTeams.map((t) => t.id),
+		}
+	}
+
+	// Fetch teams where user is creator (BTO)
+	const createdTeams = await prisma.buildTeam.findMany({
+		where: { creator: { ssoId: userId } },
+		select: { id: true },
+	})
+
+	// Fetch teams where user has team.claims.edit permission
+	const userPermissions = await prisma.userPermission.findMany({
+		where: {
+			user: { ssoId: userId },
+			permission: { id: 'team.claims.edit' },
+		},
+		select: {
+			buildTeamId: true,
+		},
+	})
+
+	const hasGlobalPermission = userPermissions.some((p) => p.buildTeamId == null)
+	if (hasGlobalPermission) {
+		const allTeams = await prisma.buildTeam.findMany({ select: { id: true } })
+		return {
+			userId,
+			isAdmin: false,
+			editableBuildTeamIds: allTeams.map((t) => t.id),
+		}
+	}
+
+	const teamIdSet = new Set<string>()
+	for (const t of createdTeams) teamIdSet.add(t.id)
+	for (const p of userPermissions) {
+		if (p.buildTeamId) teamIdSet.add(p.buildTeamId)
+	}
+
+	return {
+		userId,
+		isAdmin: false,
+		editableBuildTeamIds: Array.from(teamIdSet),
+	}
+}
+
+// Prisma result extensions add non-plain objects, which cannot be passed to Client Components
+const toPlainImage = (image: {
+	id: string
+	name: string
+	hash: string
+	height: number
+	width: number
+	createdAt: Date
+	src: string
+}) => ({
+	id: image.id,
+	name: image.name,
+	hash: image.hash,
+	height: image.height,
+	width: image.width,
+	createdAt: image.createdAt,
+	src: image.src,
+})
 
 export const getPersonalClaims = async () => {
 	const session = await getSession()
@@ -13,28 +108,117 @@ export const getPersonalClaims = async () => {
 	const userId = session.user.id
 
 	const claims = await prisma.claim.findMany(constructClaimGeoJSONQuery({ user: userId, extended: true }))
-	return claims
+	return claims.map((c) => ({ ...c, images: c.images.map(toPlainImage) }))
+}
+
+export const getClaim = async (id: string) => {
+	const session = await getSession()
+	if (!session) throw new Error('Unauthorized')
+
+	const query = constructClaimGeoJSONQuery({ extended: true })
+	const claim = await prisma.claim.findUnique({
+		where: { id },
+		select: query.select,
+	})
+	return claim && { ...claim, images: claim.images.map(toPlainImage) }
 }
 
 export const getAllowedBuildTeams = async () => {
 	const session = await getSession()
 	if (!session) throw new Error('Unauthorized')
 	const userId = session.user.id
+	const isAdmin = hasRole(session, 'edit-claims') || hasRole(session, 'review-claims')
+
+	if (isAdmin) {
+		const buildTeams = await prisma.buildTeam.findMany({
+			select: { id: true },
+		})
+		return buildTeams.map((bt) => bt.id)
+	}
 
 	const buildTeams = await prisma.buildTeam.findMany({
 		where: {
-			members: {
-				some: {
-					ssoId: userId,
+			OR: [
+				{
+					members: {
+						some: {
+							ssoId: userId,
+						},
+					},
+					allowBuilderClaim: true,
 				},
-			},
-			allowBuilderClaim: true,
+				{
+					creator: {
+						ssoId: userId,
+					},
+				},
+				{
+					UserPermission: {
+						some: {
+							user: { ssoId: userId },
+							permission: { id: 'team.claims.edit' },
+						},
+					},
+				},
+			],
 		},
 		select: {
 			id: true,
 		},
 	})
-	return buildTeams.map((bt: { id: string }) => bt.id)
+	return buildTeams.map((bt) => bt.id)
+}
+
+/**
+ * Sends a BuildTeam webhook for a claim event, if the claim's BuildTeam has a webhook configured
+ * Failures to enqueue must never break the claim operation itself
+ */
+const sendClaimWebhook = async (
+	type: 'CLAIM_CREATE' | 'CLAIM_UPDATE' | 'CLAIM_DELETE',
+	claim: { buildTeam?: { webhook: string | null } | null },
+) => {
+	const webhook = claim.buildTeam?.webhook
+	if (!webhook) return
+
+	try {
+		await redisEventQueue.addJob(RedisEvent.BUILDTEAM_WEBHOOK, {
+			type,
+			data: { ...claim, buildTeam: undefined },
+			destination: [{ url: webhook }],
+		})
+	} catch (e) {
+		console.error(`Failed to enqueue ${type} webhook`, e)
+	}
+}
+
+type ClaimPermissionTarget = {
+	owner?: { ssoId?: string | null; id?: string | null } | null
+	buildTeam?: { id: string; slug: string; creator?: { ssoId: string } | null } | null
+}
+
+const checkCanEditClaim = async (userId: string, session: any, claim: ClaimPermissionTarget): Promise<boolean> => {
+	const isOwner = claim.owner?.ssoId === userId || claim.owner?.id === userId
+	if (isOwner) return true
+
+	return checkIsClaimStaff(userId, session, claim)
+}
+
+const checkIsClaimStaff = async (userId: string, session: any, claim: ClaimPermissionTarget): Promise<boolean> => {
+	const isAdmin = hasRole(session, 'edit-claims') || hasRole(session, 'review-claims')
+	if (isAdmin) return true
+
+	if (claim.buildTeam) {
+		const isCreator = claim.buildTeam.creator?.ssoId === userId
+		if (isCreator) return true
+
+		const hasTeamPerm = await checkBuildTeamPermission(userId, {
+			id: claim.buildTeam.id,
+			permission: 'team.claims.edit',
+		})
+		if (hasTeamPerm) return true
+	}
+
+	return false
 }
 
 export const saveClaim = async (data: {
@@ -51,18 +235,41 @@ export const saveClaim = async (data: {
 	const userId = session.user.id
 
 	try {
-		const claim = await prisma.claim.findFirst({
-			where: { id: data.id, owner: { ssoId: userId } },
+		const claim = await prisma.claim.findUnique({
+			where: { id: data.id },
+			select: {
+				id: true,
+				buildTeamId: true,
+				owner: { select: { ssoId: true, id: true } },
+				buildTeam: { select: { id: true, slug: true, creator: { select: { ssoId: true } } } },
+			},
 		})
 
 		if (!claim) {
 			throw new Error('Claim not found or you do not have permission to edit this claim.')
 		}
 
-		await prisma.claim.update({
-			where: { id: data.id, owner: { ssoId: userId } },
+		const canEdit = await checkCanEditClaim(userId, session, claim)
+		if (!canEdit) {
+			throw new Error('Claim not found or you do not have permission to edit this claim.')
+		}
+
+		let size: number | undefined = undefined
+		if (data.area) {
+			try {
+				size = data.area.length >= 3 ? Math.round(turf.area(toPolygon(data.area))) : 0
+			} catch (e) {
+				size = 0
+			}
+		}
+
+		const updatedClaim = await prisma.claim.update({
+			where: { id: data.id },
+			include: { buildTeam: { select: { webhook: true } } },
 			data: {
 				area: data.area,
+				center: data.area ? calculateCenter(data.area) : undefined,
+				size,
 				name: data.name !== undefined ? data.name : undefined,
 				description: data.description !== undefined ? data.description : undefined,
 				city: data.city !== undefined ? data.city : undefined,
@@ -77,7 +284,15 @@ export const saveClaim = async (data: {
 			})
 		}
 
+		await sendClaimWebhook('CLAIM_UPDATE', updatedClaim)
+
 		revalidatePath('/claims/editor')
+		revalidatePath('/me/claims')
+		revalidatePath(`/me/claims/${claim.id}`)
+		if (claim.buildTeam?.slug) {
+			revalidatePath(`/team/${claim.buildTeam.slug}/claims`)
+			revalidatePath(`/team/${claim.buildTeam.slug}/claims/${claim.id}`)
+		}
 	} catch (e) {
 		let msg = 'Unknown error'
 		if (e instanceof Error) {
@@ -102,15 +317,43 @@ export const createClaim = async (data: {
 	const userId = session.user.id
 
 	try {
-		const buildTeam = await prisma.buildTeam.findFirst({
-			where: { id: data.buildTeamId, members: { some: { ssoId: userId } }, allowBuilderClaim: true },
-		})
+		const isAdmin = hasRole(session, 'edit-claims') || hasRole(session, 'review-claims')
+		let canCreate = isAdmin
 
-		if (!buildTeam) {
+		if (!canCreate) {
+			const isCreatorOrPermitted = await checkBuildTeamPermission(userId, {
+				id: data.buildTeamId,
+				permission: 'team.claims.edit',
+			})
+			if (isCreatorOrPermitted) {
+				canCreate = true
+			}
+		}
+
+		if (!canCreate) {
+			const buildTeam = await prisma.buildTeam.findFirst({
+				where: { id: data.buildTeamId, members: { some: { ssoId: userId } }, allowBuilderClaim: true },
+			})
+			if (buildTeam) {
+				canCreate = true
+			}
+		}
+
+		if (!canCreate) {
 			throw new Error('You do not have permission to create a claim in this BuildTeam.')
 		}
 
-		await prisma.claim.create({
+		let size = 0
+		if (data.area && data.area.length >= 3) {
+			try {
+				size = Math.round(turf.area(toPolygon(data.area)))
+			} catch (e) {
+				size = 0
+			}
+		}
+
+		const createdClaim = await prisma.claim.create({
+			include: { buildTeam: { select: { webhook: true } } },
 			data: {
 				id: data.id,
 				name: data.name || '',
@@ -119,6 +362,8 @@ export const createClaim = async (data: {
 				owner: { connect: { ssoId: userId } },
 				buildTeam: { connect: { id: data.buildTeamId } },
 				area: data.area,
+				center: calculateCenter(data.area),
+				size,
 				active: true,
 				finished: false,
 			},
@@ -127,6 +372,8 @@ export const createClaim = async (data: {
 		await redisEventQueue.addJob(RedisEvent.SYNC_CLAIM_OSM, {
 			claimId: data.id,
 		})
+
+		await sendClaimWebhook('CLAIM_CREATE', createdClaim)
 
 		revalidatePath('/claims/editor')
 	} catch (e) {
@@ -146,19 +393,44 @@ export const deleteClaim = async (data: { id: string }): Promise<void> => {
 	const userId = session.user.id
 
 	try {
-		const claim = await prisma.claim.findFirst({
-			where: { id: data.id, owner: { ssoId: userId } },
+		const claim = await prisma.claim.findUnique({
+			where: { id: data.id },
+			select: {
+				id: true,
+				buildTeamId: true,
+				owner: { select: { ssoId: true, id: true } },
+				buildTeam: { select: { id: true, slug: true, creator: { select: { ssoId: true } } } },
+				images: { select: { id: true, name: true, Showcase: { select: { id: true }, take: 1 } } },
+			},
 		})
 
 		if (!claim) {
 			throw new Error('Claim not found or you do not have permission to delete this claim.')
 		}
 
-		await prisma.claim.delete({
-			where: { id: data.id, owner: { ssoId: userId } },
-		})
+		const canDelete = await checkCanEditClaim(userId, session, claim)
+		if (!canDelete) {
+			throw new Error('Claim not found or you do not have permission to delete this claim.')
+		}
+
+		// Images still used by a showcase stay around, all others are removed with the claim
+		const unusedImages = claim.images.filter((image) => image.Showcase.length === 0)
+		const [, deletedClaim] = await prisma.$transaction([
+			prisma.upload.deleteMany({ where: { id: { in: unusedImages.map((image) => image.id) } } }),
+			prisma.claim.delete({
+				where: { id: data.id },
+				include: { buildTeam: { select: { webhook: true } } },
+			}),
+		])
+		await Promise.all(unusedImages.map((image) => deleteImage(image.name)))
+
+		await sendClaimWebhook('CLAIM_DELETE', deletedClaim)
 
 		revalidatePath('/claims/editor')
+		revalidatePath('/me/claims')
+		if (claim.buildTeam?.slug) {
+			revalidatePath(`/team/${claim.buildTeam.slug}/claims`)
+		}
 	} catch (e) {
 		let msg = 'Unknown error'
 		if (e instanceof Error) {
@@ -168,4 +440,139 @@ export const deleteClaim = async (data: { id: string }): Promise<void> => {
 		}
 		throw new Error(msg)
 	}
+}
+
+const claimPermissionSelect = {
+	id: true,
+	owner: { select: { ssoId: true, id: true } },
+	buildTeam: { select: { id: true, slug: true, creator: { select: { ssoId: true } } } },
+} satisfies Prisma.ClaimSelect
+
+const revalidateClaimPaths = (claim: { id: string; buildTeam?: { slug: string } | null }) => {
+	revalidatePath('/claims/editor')
+	revalidatePath('/me/claims')
+	revalidatePath(`/me/claims/${claim.id}`)
+	if (claim.buildTeam?.slug) {
+		revalidatePath(`/team/${claim.buildTeam.slug}/claims`)
+		revalidatePath(`/team/${claim.buildTeam.slug}/claims/${claim.id}`)
+	}
+}
+
+export const setClaimBuilders = async (data: { id: string; builderIds: string[] }) => {
+	const session = await getSession()
+	if (!session) throw new Error('Unauthorized')
+	const userId = session.user.id
+
+	const claim = await prisma.claim.findUnique({ where: { id: data.id }, select: claimPermissionSelect })
+	if (!claim || !(await checkCanEditClaim(userId, session, claim))) {
+		throw new Error('Claim not found or you do not have permission to edit this claim.')
+	}
+
+	const builderIds = Array.from(new Set(data.builderIds))
+	if (claim.owner && builderIds.includes(claim.owner.id)) {
+		throw new Error('The owner of a claim cannot be added as a builder.')
+	}
+
+	const users = await prisma.user.findMany({ where: { id: { in: builderIds } }, select: { id: true } })
+	if (users.length !== builderIds.length) throw new Error('One or more users could not be found.')
+
+	const updatedClaim = await prisma.claim.update({
+		where: { id: data.id },
+		include: {
+			buildTeam: { select: { webhook: true, slug: true } },
+			builders: { select: { id: true, avatar: true, minecraft: true, username: true } },
+		},
+		data: { builders: { set: builderIds.map((id) => ({ id })) } },
+	})
+
+	await sendClaimWebhook('CLAIM_UPDATE', updatedClaim)
+	revalidateClaimPaths(updatedClaim)
+
+	return updatedClaim.builders
+}
+
+export const transferClaim = async (data: { id: string; newOwnerId: string }) => {
+	const session = await getSession()
+	if (!session) throw new Error('Unauthorized')
+	const userId = session.user.id
+
+	const claim = await prisma.claim.findUnique({ where: { id: data.id }, select: claimPermissionSelect })
+	if (!claim || !(await checkIsClaimStaff(userId, session, claim))) {
+		throw new Error('Claim not found or you do not have permission to transfer this claim.')
+	}
+
+	if (claim.owner?.id === data.newOwnerId) throw new Error('This user already owns the claim.')
+
+	const newOwner = await prisma.user.findFirst({
+		where: { id: data.newOwnerId, joinedBuildTeams: { some: { id: claim.buildTeam.id } } },
+		select: { id: true },
+	})
+	if (!newOwner) throw new Error("The new owner must be a member of the claim's Build Team.")
+
+	const updatedClaim = await prisma.claim.update({
+		where: { id: data.id },
+		include: { buildTeam: { select: { webhook: true, slug: true } } },
+		data: {
+			owner: { connect: { id: newOwner.id } },
+			builders: {
+				disconnect: [{ id: newOwner.id }],
+				...(claim.owner ? { connect: [{ id: claim.owner.id }] } : {}),
+			},
+		},
+	})
+
+	await sendClaimWebhook('CLAIM_UPDATE', updatedClaim)
+	revalidateClaimPaths(updatedClaim)
+}
+
+export const uploadClaimImage = async (claimId: string, formData: FormData) => {
+	const session = await getSession()
+	if (!session) throw new Error('Unauthorized')
+
+	const claim = await prisma.claim.findUnique({ where: { id: claimId }, select: claimPermissionSelect })
+	if (!claim || !(await checkCanEditClaim(session.user.id, session, claim))) {
+		throw new Error('Claim not found or you do not have permission to edit this claim.')
+	}
+
+	const image = await readImage(formData.get('image'))
+	const name = randomBytes(32).toString('hex')
+	await putImage(name, image)
+
+	try {
+		const upload = await prisma.upload.create({
+			data: { name, width: image.width, height: image.height, hash: image.hash, Claim: { connect: { id: claimId } } },
+		})
+		revalidateClaimPaths(claim)
+		return toPlainImage(upload)
+	} catch (e) {
+		await deleteImage(name)
+		throw e
+	}
+}
+
+export const deleteClaimImage = async (data: { id: string; imageId: string }) => {
+	const session = await getSession()
+	if (!session) throw new Error('Unauthorized')
+
+	const claim = await prisma.claim.findUnique({
+		where: { id: data.id },
+		select: { ...claimPermissionSelect, images: { where: { id: data.imageId }, select: { id: true, name: true } } },
+	})
+	if (!claim || !(await checkCanEditClaim(session.user.id, session, claim))) {
+		throw new Error('Claim not found or you do not have permission to edit this claim.')
+	}
+
+	const image = claim.images[0]
+	if (!image) throw new Error('Image not found.')
+
+	// Showcases reference their upload, so the row must stay if the image is still used there
+	const showcases = await prisma.showcase.count({ where: { uploadId: image.id } })
+	if (showcases) {
+		await prisma.upload.update({ where: { id: image.id }, data: { Claim: { disconnect: true } } })
+	} else {
+		await prisma.upload.delete({ where: { id: image.id } })
+		await deleteImage(image.name)
+	}
+
+	revalidateClaimPaths(claim)
 }

@@ -98,11 +98,6 @@ export type ApplicationResponseTemplate = Prisma.ApplicationResponseTemplateMode
  */
 export type Upload = Prisma.UploadModel
 /**
- * Model CalendarEvent
- * 
- */
-export type CalendarEvent = Prisma.CalendarEventModel
-/**
  * Model JsonStore
  * 
  */

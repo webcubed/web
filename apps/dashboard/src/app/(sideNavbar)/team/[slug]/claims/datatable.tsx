@@ -5,6 +5,7 @@ import {
 	Code,
 	Group,
 	Menu,
+	MenuDivider,
 	MenuDropdown,
 	MenuItem,
 	MenuLabel,
@@ -18,10 +19,12 @@ import {
 	IconBlendMode,
 	IconCirclesRelation,
 	IconDots,
+	IconEdit,
 	IconExternalLink,
 	IconEye,
 	IconId,
 	IconTrash,
+	IconUserExclamation,
 } from '@tabler/icons-react'
 import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation'
 
@@ -29,11 +32,13 @@ import { deleteClaim } from '@/actions/buildTeams'
 import { adminDeleteClaim } from '@/actions/claims'
 import { BuildTeamDisplay } from '@/components/data/BuildTeam'
 import { UserDisplay } from '@/components/data/User'
+import { ACTION_COLORS } from '@/util/actions'
 import { useClipboard } from '@mantine/hooks'
-import { closeAllModals, openConfirmModal } from '@mantine/modals'
+import { closeAllModals, modals, openConfirmModal } from '@mantine/modals'
 import type { Claim } from '@repo/db'
 import { DataTable } from 'mantine-datatable'
 import Link from 'next/link'
+import { EditClaimModal, TransferClaimModal } from './[id]/interactivity'
 
 export default function ClaimsDatatable({
 	claims,
@@ -118,16 +123,17 @@ export default function ClaimsDatatable({
 									</ActionIcon>
 								</MenuTarget>
 								<MenuDropdown>
-									{claim.externalId && (
-										<MenuItem
-											leftSection={<IconCirclesRelation style={{ width: rem(14), height: rem(14) }} />}
-											aria-label="Copy External ID"
-											onClick={() => clipboard.copy(claim.externalId)}
-											color="yellow"
-										>
-											Copy External ID
-										</MenuItem>
-									)}
+									<MenuItem
+										leftSection={<IconEye style={{ width: rem(14), height: rem(14) }} />}
+										color={ACTION_COLORS.view}
+										aria-label="View Details"
+										component={Link}
+										href={`/team/${buildTeamSlug}/claims/${claim.id}`}
+										rel="noopener"
+									>
+										View Details
+									</MenuItem>
+									<MenuDivider />
 									<MenuItem
 										leftSection={<IconId style={{ width: rem(14), height: rem(14) }} />}
 										aria-label="Copy ID"
@@ -135,15 +141,62 @@ export default function ClaimsDatatable({
 									>
 										Copy ID
 									</MenuItem>
+									{claim.externalId && (
+										<MenuItem
+											leftSection={<IconCirclesRelation style={{ width: rem(14), height: rem(14) }} />}
+											aria-label="Copy External ID"
+											onClick={() => clipboard.copy(claim.externalId)}
+										>
+											Copy External ID
+										</MenuItem>
+									)}
+									<MenuDivider />
 									<MenuItem
 										leftSection={<IconExternalLink style={{ width: rem(14), height: rem(14) }} />}
+										color={ACTION_COLORS.view}
+										aria-label="Open on Website"
 										component={Link}
 										target="_blank"
 										href={`https://buildtheearth.net/map?claim=${claim.id}`}
 									>
 										Open on Website
 									</MenuItem>
+									<MenuDivider />
+									<MenuItem
+										leftSection={<IconEdit style={{ width: rem(14), height: rem(14) }} />}
+										color="yellow"
+										aria-label="Edit Claim"
+										disabled={!permissions?.includes('team.claims.edit') && !permissions?.includes('team.claim.list')}
+										onClick={() =>
+											modals.open({
+												id: 'edit-claim',
+												title: 'Edit Claim',
+												centered: true,
+												size: 'lg',
+												children: <EditClaimModal {...claim} buildTeamSlug={buildTeamSlug} />,
+											})
+										}
+									>
+										Edit Claim
+									</MenuItem>
+									<MenuDivider />
 									<MenuLabel>Danger Zone</MenuLabel>
+									<MenuItem
+										leftSection={<IconUserExclamation style={{ width: rem(14), height: rem(14) }} />}
+										color="red"
+										aria-label="Transfer Claim"
+										disabled={!permissions?.includes('team.claims.edit')}
+										onClick={() =>
+											modals.open({
+												id: 'transfer-claim',
+												title: 'Transfer Claim',
+												centered: true,
+												children: <TransferClaimModal claimId={claim.id} />,
+											})
+										}
+									>
+										Transfer Claim
+									</MenuItem>
 									<MenuItem
 										leftSection={<IconTrash style={{ width: rem(14), height: rem(14) }} />}
 										color="red"

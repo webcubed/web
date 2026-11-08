@@ -3,7 +3,7 @@ import SplitTextAnimation from '@/components/animations/SplitText'
 import Wrapper from '@/components/layout/Wrapper'
 import chevronBounceLottie from '@/public/animations/chevron-bounce.json'
 import prisma from '@/util/db'
-import { getLanguageAlternates } from '@/util/seo'
+import { getLanguageAlternates, getLocalizedUrl } from '@/util/seo'
 import {
 	Accordion,
 	AccordionControl,
@@ -39,7 +39,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 			builders,
 		)} people who make BuildTheEarth possible!`,
 		alternates: {
-			languages: getLanguageAlternates('/our-progress'),
+			canonical: getLocalizedUrl(locale, '/contributors'),
+			languages: getLanguageAlternates('/contributors'),
 		},
 	}
 }
@@ -82,12 +83,17 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 			image: { select: { name: true, hash: true } },
 		},
 	})
+	const heroImage = showcaseImages[0]?.image
 
 	return (
 		<Wrapper offsetHeader={false} padded={false}>
 			<BackgroundImage
 				//  ._. Mantine doesnt parse the src prop so we can escape it to add an additional (fallback/loading) image
-				src={`${process.env.NEXT_PUBLIC_CDN_URL}/uploads/${showcaseImages[0].image.name}), url('${showcaseImages[0].image.hash}'`}
+				src={
+					heroImage
+						? `${process.env.NEXT_PUBLIC_CDN_URL}/uploads/${heroImage.name}), url('${heroImage.hash || ''}'`
+						: ''
+				}
 				aria-label={'Image'}
 				w="100%"
 				h="100%"
@@ -147,7 +153,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 						{buildersWithMinecraftAlphabetic
 							.concat(buildersWithMinecraftNonAlphabetic)
 							.concat(buildersWithUsernameOnly)
-							.map((builder) => builder.minecraft || builder.username || builder.discordId)
+							.map((builder) => builder.minecraft || builder.username)
 							.join(', ')}
 					</Text>
 					<Text ta="left" mt="xl">
@@ -163,9 +169,7 @@ export default async function Page({ params }: { params: Promise<{ locale: Local
 							<AccordionControl>View Anonymous Builders</AccordionControl>
 							<AccordionPanel>
 								<Text w="100%" style={{ textAlign: 'justify' }} fz="xl">
-									{buildersWithoutName
-										.map((builder) => builder.minecraft || builder.username || builder.discordId)
-										.join(', ')}
+									{buildersWithoutName.map((_, index) => `Anonymous Builder #${index + 1}`).join(', ')}
 								</Text>
 							</AccordionPanel>
 						</AccordionItem>

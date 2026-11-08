@@ -1,8 +1,10 @@
 import {
 	createClaim as createClaimAction,
 	deleteClaim as deleteClaimAction,
+	getClaim,
 	getPersonalClaims,
 	saveClaim as saveClaimAction,
+	setClaimBuilders,
 } from '@/actions/claimEditor'
 import { modals } from '@mantine/modals'
 import { showNotification, updateNotification } from '@mantine/notifications'
@@ -11,6 +13,8 @@ import { TerraDraw } from 'terra-draw'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { CreateClaimModal } from './interactivity'
+
+const DRAW_COORDINATE_PRECISION = 9
 
 export type ClaimEditorClaim = Awaited<ReturnType<typeof getPersonalClaims>>[0]
 
@@ -24,6 +28,22 @@ function ensureClosedCoordinates(coords: number[][]): number[][] {
 	return coords
 }
 
+function roundCoordinates(coords: number[][]): number[][] {
+	return coords.map(([lng, lat]) => [
+		Number(lng.toFixed(DRAW_COORDINATE_PRECISION)),
+		Number(lat.toFixed(DRAW_COORDINATE_PRECISION)),
+	])
+}
+
+function addFeatureToDraw(draw: TerraDraw, feature: any): boolean {
+	const [result] = draw.addFeatures([feature])
+	if (result && !result.valid) {
+		console.warn('Rejecting drawing claim:', result.reason)
+		return false
+	}
+	return true
+}
+
 interface ClaimEditorState {
 	drawInstance: TerraDraw | null
 	selectedClaimId: string | null
@@ -32,6 +52,8 @@ interface ClaimEditorState {
 	isInitialized: boolean
 	allowedBuildTeamIds: string[] | null
 	userId: string | null
+	isAdmin: boolean
+	editableBuildTeamIds: string[] | null
 	isDirty: boolean
 	isLoading: boolean
 
@@ -39,6 +61,8 @@ interface ClaimEditorState {
 	setClaims: (claims: ClaimEditorClaim[]) => void
 	setAllowedBuildTeamIds: (allowedBuildTeamIds: string[] | null) => void
 	setUserId: (userId: string | null) => void
+	setIsAdmin: (isAdmin: boolean) => void
+	setEditableBuildTeamIds: (editableBuildTeamIds: string[] | null) => void
 	setSelectedClaim: (
 		claimId: string | null,
 		opts?: { keepPosition?: boolean; fromMapClick?: boolean; feature?: any },
@@ -56,6 +80,8 @@ interface ClaimEditorState {
 		active?: boolean
 		finished?: boolean
 	}) => Promise<void>
+	updateClaimBuilders: (builderIds: string[]) => Promise<void>
+	setClaimImages: (claimId: string, images: ClaimEditorClaim['images']) => void
 	createClaim: (data: {
 		id: string
 		area: string[]
@@ -77,6 +103,8 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 		isInitialized: false,
 		allowedBuildTeamIds: null,
 		userId: null,
+		isAdmin: false,
+		editableBuildTeamIds: null,
 		isDirty: false,
 		isLoading: false,
 
@@ -84,6 +112,8 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 		setClaims: (claims) => set({ claims, isInitialized: true }),
 		setAllowedBuildTeamIds: (allowedBuildTeamIds) => set({ allowedBuildTeamIds }),
 		setUserId: (userId) => set({ userId }),
+		setIsAdmin: (isAdmin) => set({ isAdmin }),
+		setEditableBuildTeamIds: (editableBuildTeamIds) => set({ editableBuildTeamIds }),
 
 		setSelectedClaim: (claimId, opts) => {
 			const draw = get().drawInstance
@@ -112,7 +142,7 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 					if (geom && geom.type === 'Polygon' && geom.coordinates?.[0]) {
 						geom = {
 							...geom,
-							coordinates: [ensureClosedCoordinates(geom.coordinates[0])],
+							coordinates: [roundCoordinates(ensureClosedCoordinates(geom.coordinates[0]))],
 						}
 					}
 					const f = {
@@ -125,10 +155,12 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 							mode: 'polygon',
 						},
 					}
-					draw.addFeatures([f])
+					addFeatureToDraw(draw, f)
 					feature = draw.hasFeature(claimId) ? draw.getSnapshotFeature(claimId) : null
 				} else if (claim && claim.area && claim.area.length >= 3) {
-					const coords = ensureClosedCoordinates(claim.area.map((str: string) => str.split(', ').map(Number)))
+					const coords = roundCoordinates(
+						ensureClosedCoordinates(claim.area.map((str: string) => str.split(', ').map(Number))),
+					)
 					const f = {
 						id: claimId,
 						type: 'Feature' as const,
@@ -144,19 +176,34 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 							mode: 'polygon',
 						},
 					}
-					draw.addFeatures([f])
+					addFeatureToDraw(draw, f)
 					feature = draw.hasFeature(claimId) ? draw.getSnapshotFeature(claimId) : null
 				}
 			}
 
+			if (!draw.hasFeature(claimId)) {
+				showNotification({
+					title: 'Error',
+					message: 'This claim could not be loaded into the editor.',
+					color: 'red',
+				})
+				return false
+			}
+
 			const userId = get().userId
+			const isAdmin = get().isAdmin
+			const editableTeamIds = get().editableBuildTeamIds || []
 			const props = (feature?.properties || {}) as Record<string, any>
+			const teamId = props.buildTeamId || props.buildTeam?.id || claim?.buildTeam?.id || claim?.buildTeamId
+
 			const isOwner =
 				(userId && (props.owner?.ssoId === userId || props.owner?.id === userId)) ||
-				Boolean(claim) ||
+				Boolean(claim && userId && (claim.owner?.ssoId === userId || claim.owner?.id === userId)) ||
 				props.new === true
 
-			if (isOwner) {
+			const canEdit = Boolean(isOwner) || Boolean(isAdmin) || Boolean(teamId && editableTeamIds.includes(teamId))
+
+			if (canEdit) {
 				let centerCoords: [number, number] | null = null
 				if (claim?.center) {
 					centerCoords = claim.center.split(', ').map(Number) as [number, number]
@@ -198,6 +245,22 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 		},
 
 		switchClaim: async (claimId, opts) => {
+			if (claimId && !get().claims.some((c) => c.id === claimId)) {
+				try {
+					const fetched = await getClaim(claimId)
+					if (fetched) {
+						// The initial claim list may have finished loading while this was fetching
+						set((state) =>
+							state.claims.some((c) => c.id === claimId)
+								? state
+								: { claims: [...state.claims, fetched as ClaimEditorClaim] },
+						)
+					}
+				} catch (e) {
+					console.warn('Failed to fetch claim:', e)
+				}
+			}
+
 			const currentSelected = get().selectedClaimId
 			if (claimId === currentSelected) return true
 
@@ -281,9 +344,11 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 			try {
 				await saveClaimAction({ id, area })
 
-				// Update personal claims in store with new area
-				const updatedClaims = await getPersonalClaims()
-				set({ claims: updatedClaims, isDirty: false })
+				// Update claim in store with new area
+				set((state) => ({
+					claims: state.claims.map((c) => (c.id === id ? { ...c, area } : c)),
+					isDirty: false,
+				}))
 
 				updateNotification({
 					id: notifyId,
@@ -337,7 +402,18 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 					})
 				}
 
-				const updatedClaims = await getPersonalClaims()
+				const updatedClaims = get().claims.map((c) =>
+					c.id === id
+						? {
+								...c,
+								...(data.name !== undefined ? { name: data.name } : {}),
+								...(data.city !== undefined ? { city: data.city } : {}),
+								...(data.description !== undefined ? { description: data.description } : {}),
+								...(data.active !== undefined ? { active: data.active } : {}),
+								...(data.finished !== undefined ? { finished: data.finished } : {}),
+							}
+						: c,
+				)
 				set({ claims: updatedClaims })
 
 				updateNotification({
@@ -364,6 +440,37 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 			}
 		},
 
+		updateClaimBuilders: async (builderIds) => {
+			const id = get().selectedClaimId
+			if (!id) return
+
+			try {
+				const builders = await setClaimBuilders({ id, builderIds })
+				set({
+					claims: get().claims.map((c) =>
+						c.id === id ? { ...c, builders: builders as ClaimEditorClaim['builders'] } : c,
+					),
+				})
+				showNotification({
+					title: 'Builders Updated',
+					message: 'Claim builders have been updated.',
+					color: 'green',
+					icon: <IconCheck size={18} />,
+				})
+			} catch (e) {
+				showNotification({
+					title: 'Error',
+					message: e instanceof Error ? e.message : 'Failed to update builders',
+					color: 'red',
+					icon: <IconX size={18} />,
+				})
+			}
+		},
+
+		setClaimImages: (claimId, images) => {
+			set({ claims: get().claims.map((c) => (c.id === claimId ? { ...c, images } : c)) })
+		},
+
 		createClaim: async (data) => {
 			const draw = get().drawInstance
 			if (!draw) return
@@ -388,8 +495,12 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 					})
 				}
 
-				const updatedClaims = await getPersonalClaims()
-				set({ claims: updatedClaims, isDirty: false, selectedClaimId: data.id })
+				const fetched = await getClaim(data.id)
+				set((state) => ({
+					claims: [...state.claims.filter((c) => c.id !== data.id), ...(fetched ? [fetched as ClaimEditorClaim] : [])],
+					isDirty: false,
+					selectedClaimId: data.id,
+				}))
 
 				if (draw.hasFeature(data.id)) {
 					try {
@@ -465,8 +576,11 @@ export const useClaimEditorStore = create<ClaimEditorState>()(
 						} catch (e) {
 							console.warn('Error resetting draw mode after delete:', e)
 						}
-						const updatedClaims = await getPersonalClaims()
-						set({ claims: updatedClaims, selectedClaimId: null, isDirty: false })
+						set((state) => ({
+							claims: state.claims.filter((c) => c.id !== id),
+							selectedClaimId: null,
+							isDirty: false,
+						}))
 
 						updateNotification({
 							id: notifyId,

@@ -4,6 +4,7 @@ import { ownerGenerateToken, userEditTeamInfo, userEditTeamSocials } from '@/act
 import Anchor from '@/components/core/Anchor'
 import { TextCard } from '@/components/core/card/TextCard'
 import RTE from '@/components/input/RTE'
+import { ACTION_COLORS } from '@/util/actions'
 import { hasRole } from '@/util/auth'
 import {
 	ActionIcon,
@@ -11,6 +12,7 @@ import {
 	ColorInput,
 	Group,
 	Menu,
+	MenuDivider,
 	MenuDropdown,
 	MenuItem,
 	MenuTarget,
@@ -36,6 +38,7 @@ import {
 	IconCloudComputing,
 	IconDeviceFloppy,
 	IconDots,
+	IconExternalLink,
 	IconForms,
 	IconGlobe,
 	IconId,
@@ -46,6 +49,7 @@ import {
 	IconTrash,
 } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -86,6 +90,7 @@ export function EditTeamForm({ team }: { team: BuildTeam }) {
 	const [allowApplications, setAllowApplications] = useState(team.allowApplications ?? false)
 	const [allowTrial, setAllowTrial] = useState(team.allowTrial ?? false)
 	const [allowBuilderClaim, setAllowBuilderClaim] = useState(team.allowBuilderClaim ?? false)
+	const [supportsBedrock, setSupportsBedrock] = useState(team.supportsBedrock ?? false)
 
 	useEffect(() => {
 		setName(team.name)
@@ -96,6 +101,7 @@ export function EditTeamForm({ team }: { team: BuildTeam }) {
 		setAllowApplications(team.allowApplications ?? false)
 		setAllowTrial(team.allowTrial ?? false)
 		setAllowBuilderClaim(team.allowBuilderClaim ?? false)
+		setSupportsBedrock(team.supportsBedrock ?? false)
 	}, [team])
 
 	return (
@@ -293,6 +299,15 @@ export function EditTeamForm({ team }: { team: BuildTeam }) {
 							name="invite"
 							description="A link to your BuildTeam's Discord server."
 						/>
+
+						<Switch
+							label="Supports Bedrock"
+							checked={supportsBedrock}
+							onChange={(e) => setSupportsBedrock(e.currentTarget.checked)}
+							id="supportsBedrock"
+							name="supportsBedrock"
+							description="Set that your buildteam supports Bedrock players."
+						/>
 					</SimpleGrid>
 				</TextCard>
 
@@ -386,8 +401,16 @@ export function EditTeamForm({ team }: { team: BuildTeam }) {
 			</Stack>
 
 			<Tooltip label="Save Changes on main Settings">
-				<Button color="green" type="submit" mt="md" fullWidth loading={isSaving} disabled={isSaving}>
-					Save
+				<Button
+					color="green"
+					type="submit"
+					mt="md"
+					fullWidth
+					leftSection={<IconDeviceFloppy size={14} />}
+					loading={isSaving}
+					disabled={isSaving}
+				>
+					Save Changes
 				</Button>
 			</Tooltip>
 		</form>
@@ -530,12 +553,12 @@ export function SocialLinksEditor({
 					<Tooltip label="Save Changes on Socials">
 						<Button
 							color="green"
-							rightSection={<IconDeviceFloppy size={14} />}
+							leftSection={<IconDeviceFloppy size={14} />}
 							type="submit"
 							loading={isSaving}
 							disabled={isSaving}
 						>
-							Save
+							Save Changes
 						</Button>
 					</Tooltip>
 				</Group>
@@ -578,7 +601,7 @@ export function SocialLinksEditor({
 								/>
 								<ActionIcon
 									size="lg"
-									variant="outline"
+									variant="subtle"
 									color="red"
 									aria-label="Remove Social Link"
 									type="button"
@@ -641,6 +664,17 @@ export function EditMenu({ team }: { team: BuildTeam }) {
 					onClick={() => clipboard.copy(team.id)}
 				>
 					Copy ID
+				</MenuItem>
+				<MenuDivider />
+				<MenuItem
+					leftSection={<IconExternalLink style={{ width: rem(14), height: rem(14) }} />}
+					color={ACTION_COLORS.view}
+					aria-label="Open on Website"
+					component={Link}
+					target="_blank"
+					href={`https://buildtheearth.net/teams/${team.slug}`}
+				>
+					Open on Website
 				</MenuItem>
 			</MenuDropdown>
 		</Menu>

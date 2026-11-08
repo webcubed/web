@@ -3,6 +3,8 @@ import type UserConsentRepresentation from '@keycloak/keycloak-admin-client/lib/
 import type CredentialRepresentation from '@keycloak/keycloak-admin-client/lib/defs/credentialRepresentation.js'
 import type GroupRepresentation from '@keycloak/keycloak-admin-client/lib/defs/groupRepresentation.js'
 import type UserSessionRepresentation from '@keycloak/keycloak-admin-client/lib/defs/userSessionRepresentation.js'
+import type RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation.js'
+import type ClientRepresentation from '@keycloak/keycloak-admin-client/lib/defs/clientRepresentation.js'
 import { capitalize, snakeCaseToStartCase } from '@/util/string'
 import {
 	Alert,
@@ -23,6 +25,7 @@ import {
 	Tooltip,
 } from '@mantine/core'
 import {
+	IconBrandMinecraft,
 	IconCalendar,
 	IconClockExclamation,
 	IconDatabaseExclamation,
@@ -31,7 +34,9 @@ import {
 	IconFileCheck,
 	IconFiles,
 	IconInfoCircle,
+	IconKey,
 	IconLink,
+	IconMail,
 	IconPolygon,
 	IconShieldLock,
 	IconSwipe,
@@ -48,6 +53,7 @@ import { TextCard } from '@/components/core/card/TextCard'
 import ContentWrapper from '@/components/core/ContentWrapper'
 import ErrorDisplay from '@/components/core/ErrorDisplay'
 import { BuildTeamDisplay } from '@/components/data/BuildTeam'
+import { MinecraftDisplay, UserDisplay } from '@/components/data/User'
 import { PluralSingular } from '@/components/data/PluralSingular'
 import { Protection } from '@/components/Protection'
 import { getSession, hasRole } from '@/util/auth'
@@ -75,19 +81,76 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 		)
 	}
 
-	const keycloakData = (await keycloakAdmin.users.findOne({ id: ssoId })) as UserRepresentation
-	const keycloakConsentsData = (await keycloakAdmin.users.listConsents({
-		id: ssoId,
-	})) as UserConsentRepresentation[]
-	const keycloakCredentialsData = (await keycloakAdmin.users.getCredentials({
-		id: ssoId,
-	})) as CredentialRepresentation[]
-	const keycloakGroupsData = (await keycloakAdmin.users.listGroups({
-		id: ssoId,
-	})) as GroupRepresentation[]
-	const keycloakSessionsData = (await keycloakAdmin.users.listSessions({
-		id: ssoId,
-	})) as UserSessionRepresentation[]
+	const [
+		keycloakData,
+		keycloakConsentsData,
+		keycloakCredentialsData,
+		keycloakGroupsData,
+		keycloakSessionsData,
+		keycloakRealmRolesData,
+		keycloakClientsData,
+	] = await Promise.all([
+		keycloakAdmin.users.findOne({ id: ssoId }) as Promise<UserRepresentation>,
+		keycloakAdmin.users.listConsents({
+			id: ssoId,
+		}) as Promise<UserConsentRepresentation[]>,
+		keycloakAdmin.users.getCredentials({
+			id: ssoId,
+		}) as Promise<CredentialRepresentation[]>,
+		keycloakAdmin.users.listGroups({
+			id: ssoId,
+		}) as Promise<GroupRepresentation[]>,
+		keycloakAdmin.users.listSessions({
+			id: ssoId,
+		}) as Promise<UserSessionRepresentation[]>,
+		keycloakAdmin.users.listCompositeRealmRoleMappings({
+			id: ssoId,
+		}) as Promise<RoleRepresentation[]>,
+		keycloakAdmin.clients.find() as Promise<ClientRepresentation[]>,
+	])
+
+	const keycloakClientRolesData = (
+		await Promise.all(
+			(keycloakClientsData || []).map(async (client) => {
+				if (!client.id) return []
+				try {
+					const roles = await keycloakAdmin.users.listCompositeClientRoleMappings({
+						id: ssoId,
+						clientUniqueId: client.id,
+					})
+					return (roles || []).map((role) => ({
+						...role,
+						container: client.clientId || client.name || client.id,
+					}))
+				} catch {
+					return []
+				}
+			}),
+		)
+	).flat()
+
+	const keycloakEffectiveRoles = [
+		...(keycloakRealmRolesData || []).map((role) => ({
+			...role,
+			container: 'realm',
+		})),
+		...keycloakClientRolesData,
+	]
+
+	const keycloakRolesMap = new Map<string, (typeof keycloakEffectiveRoles)[number]>()
+	for (const role of keycloakEffectiveRoles) {
+		const key = role.id || `${role.container}/${role.name}`
+		if (!keycloakRolesMap.has(key)) {
+			keycloakRolesMap.set(key, role)
+		}
+	}
+	const keycloakRoles = Array.from(keycloakRolesMap.values()).sort((a, b) => {
+		if (a.container === 'realm' && b.container !== 'realm') return -1
+		if (a.container !== 'realm' && b.container === 'realm') return 1
+		const containerCompare = (a.container || '').localeCompare(b.container || '')
+		if (containerCompare !== 0) return containerCompare
+		return (a.name || '').localeCompare(b.name || '')
+	})
 	const websiteData = await prisma.user.findFirst({
 		where: { ssoId },
 		include: {
@@ -149,18 +212,13 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 	return (
 		<ContentWrapper maw="90vw" mih="100vh">
 			<Group justify="space-between" w="100%" mt="xl" mb="md">
-				<Flex gap="sm" justify="flex-start" align="flex-end" direction="row" wrap="nowrap">
-					<Title order={1}>
-						{websiteData?.username ||
-							websiteData?.minecraft ||
-							(websiteData?.discordId
-								? `Discord User ${websiteData.discordId}`
-								: `Anonymus user ${websiteData.id.split('-')[0]}`)}
-					</Title>
-					<Text c="dimmed" fz="sm">
-						({keycloakData?.email || 'No Email set'})
-					</Text>
-				</Flex>
+				<Title order={1}>
+					{websiteData?.username ||
+						websiteData?.minecraft ||
+						(websiteData?.discordId
+							? `Discord User ${websiteData.discordId}`
+							: `Anonymus user ${websiteData.id.split('-')[0]}`)}
+				</Title>
 				<Group gap="xs">
 					<LinkButton
 						variant="light"
@@ -193,38 +251,54 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 							discord account logs in. Till then, only limited information is available.
 						</Alert>
 					)}
-					<TextCard title="Active Sessions" icon={IconDevices} style={{ width: '100%', flexGrow: 1 }}>
-						<Table
-							highlightOnHover
-							data={{
-								head: ['#', 'Start', 'Clients', ''],
-								body: Array.isArray(keycloakSessionsData)
-									? keycloakSessionsData?.map((session) => [
-											<Code key={session.id}>{session.id?.split('-')[0] || ''}</Code>,
-											session.start ? new Date(session.start).toLocaleString() : '',
-											<Group key={session.id} gap={4}>
-												{session.clients &&
-													Object.values(session.clients).map((client) => (
-														<Badge key={client} variant="light">
-															{client}
-														</Badge>
-													))}
-											</Group>,
-										])
-									: [],
-							}}
-						/>
-					</TextCard>
-				</Flex>
-				<Grid h="100%" styles={{ inner: { height: 'calc(100% + var(--mantine-spacing-md))' } }}>
-					<GridCol span={{ base: 12, sm: 6 }}>
+					<SimpleGrid cols={{ base: 1, sm: 2 }} w="100%" h="100%" style={{ flexGrow: 1, gridAutoRows: '1fr' }}>
+						<TextCard
+							title="Username"
+							icon={IconUser}
+							subtitle={websiteData.username ? 'Website username' : 'No username set'}
+							style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+						>
+							<Group gap="sm" h={30} align="center">
+								<UserDisplay user={websiteData} noAnchor />
+							</Group>
+						</TextCard>
+						<TextCard
+							title="Pending Actions"
+							icon={IconClockExclamation}
+							subtitle={
+								Array.isArray(keycloakData?.requiredActions)
+									? keycloakData.requiredActions.length > 1
+										? `And ${keycloakData.requiredActions.length - 1} more...`
+										: 'Required Actions can be added in Keycloak'
+									: ''
+							}
+							style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+						>
+							<Flex align="center" h={30}>
+								<Text fz="sm" fw={600} truncate="end">
+									{Array.isArray(keycloakData?.requiredActions) && keycloakData.requiredActions.length > 0
+										? snakeCaseToStartCase((keycloakData.requiredActions[0] as string) || '')
+										: 'No Pending Actions'}
+								</Text>
+							</Flex>
+						</TextCard>
+						<TextCard
+							title="Minecraft Profile"
+							icon={IconBrandMinecraft}
+							subtitle={websiteData.minecraft ? 'Linked Minecraft Profile' : 'No profile linked'}
+							style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+						>
+							<Group gap="sm" h={30} align="center">
+								<MinecraftDisplay minecraft={websiteData.minecraft} />
+							</Group>
+						</TextCard>
 						<TextCard
 							title="Account Security"
 							icon={IconShieldLock}
 							subtitle="Account's Security Status"
-							style={{ height: '100%' }}
+							style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
 						>
-							<Group gap={6}>
+							<Group gap={6} h={30} align="center">
 								<Tooltip label={'Account enabled? ' + (keycloakData?.enabled ? 'Yes' : 'No')}>
 									<ColorSwatch
 										color={keycloakData?.enabled ? 'var(--mantine-color-green-7)' : 'var(--mantine-color-red-7)'}
@@ -296,66 +370,104 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 								</Tooltip>
 							</Group>
 						</TextCard>
-					</GridCol>
-					<GridCol span={{ base: 12, sm: 6 }}>
 						<TextCard
-							title="Pending Actions"
-							icon={IconClockExclamation}
+							title="Email"
+							icon={IconMail}
 							subtitle={
-								Array.isArray(keycloakData?.requiredActions)
-									? keycloakData.requiredActions.length > 1
-										? `And ${keycloakData.requiredActions.length - 1} more...`
-										: 'Required Actions can be added in Keycloak'
-									: ''
+								keycloakData?.email
+									? keycloakData.emailVerified
+										? 'Verified email'
+										: 'Unverified email'
+									: 'No email set'
 							}
-							style={{ height: '100%' }}
+							style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
 						>
-							{Array.isArray(keycloakData?.requiredActions) && keycloakData.requiredActions.length > 0
-								? snakeCaseToStartCase((keycloakData.requiredActions[0] as string) || '')
-								: 'No Pending Actions'}
+							<Flex align="center" h={30}>
+								<Text fz="sm" fw={500} truncate="end" c={keycloakData?.email ? undefined : 'dimmed'}>
+									{keycloakData?.email || 'No email set'}
+								</Text>
+							</Flex>
 						</TextCard>
-					</GridCol>
-					<GridCol span={12}>
-						<TextCard title="Identity Providers" icon={IconLink}>
-							<Table
-								highlightOnHover
-								data={{
-									head: ['Provider', 'User #', 'Username'],
-									body: Array.isArray(keycloakData?.federatedIdentities)
-										? keycloakData.federatedIdentities.map((idp) => [
-												idp.identityProvider ? capitalize(idp.identityProvider) : '',
-												idp.userId || '',
-												idp.userName ? idp.userName.replace('#0', '') : '',
-											])
-										: [],
-								}}
-							/>
-						</TextCard>
-					</GridCol>
-					<GridCol span={{ base: 12, sm: 6 }}>
 						<TextCard
-							isText
-							title="External Consents"
-							icon={IconSwipe}
-							subtitle={`${
-								Array.isArray(keycloakConsentsData) && keycloakConsentsData?.length > 1 ? 'have' : 'has'
-							} been granted from the User's Account`}
-						>
-							{keycloakConsentsData?.length || 0} Consent{keycloakConsentsData?.length > 1 ? 's' : ''}
-						</TextCard>
-					</GridCol>
-					<GridCol span={{ base: 12, sm: 6 }}>
-						<TextCard
-							isText
 							title="Account Age"
 							icon={IconCalendar}
 							subtitle={'or since ' + new Date(keycloakData?.createdTimestamp || new Date()).toLocaleDateString()}
+							style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
 						>
-							{keycloakData?.createdTimestamp ? moment().diff(new Date(keycloakData?.createdTimestamp), 'days') : 0}{' '}
-							Days
+							<Flex align="center" h={30}>
+								<Text fz="20px" fw={700} lh="1">
+									{keycloakData?.createdTimestamp ? moment().diff(new Date(keycloakData?.createdTimestamp), 'days') : 0}{' '}
+									Days
+								</Text>
+							</Flex>
 						</TextCard>
-					</GridCol>
-				</Grid>
+					</SimpleGrid>
+				</Flex>
+				<Flex h="100%" mih={50} gap="md" justify="flex-start" align="flex-start" direction="column">
+					<TextCard title="Active Sessions" icon={IconDevices} style={{ width: '100%' }}>
+						<Table
+							highlightOnHover
+							data={{
+								head: ['#', 'Start', 'Clients', ''],
+								body: Array.isArray(keycloakSessionsData)
+									? keycloakSessionsData?.map((session) => [
+											<Code key={session.id}>{session.id?.split('_')[0] || ''}</Code>,
+											session.start ? new Date(session.start).toLocaleString() : '',
+											<Group key={session.id} gap={4}>
+												{session.clients &&
+													Object.values(session.clients).map((client) => (
+														<Badge key={client} variant="light">
+															{client}
+														</Badge>
+													))}
+											</Group>,
+										])
+									: [],
+							}}
+						/>
+					</TextCard>
+					<TextCard title="Identity Providers" icon={IconLink} style={{ width: '100%' }}>
+						<Table
+							highlightOnHover
+							data={{
+								head: ['Provider', 'User #', 'Username'],
+								body: Array.isArray(keycloakData?.federatedIdentities)
+									? keycloakData.federatedIdentities.map((idp) => [
+											idp.identityProvider ? capitalize(idp.identityProvider) : '',
+											idp.userId || '',
+											idp.userName ? idp.userName.replace('#0', '') : '',
+										])
+									: [],
+							}}
+						/>
+					</TextCard>
+					<TextCard title="External Consents" icon={IconSwipe} style={{ width: '100%' }}>
+						<Table
+							highlightOnHover
+							data={{
+								head: ['Client ID', 'Granted Scopes', 'Created', 'Updated'],
+								body: Array.isArray(keycloakConsentsData)
+									? keycloakConsentsData.map((consent, index) => [
+											<Code key={consent.clientId || index}>{consent.clientId}</Code>,
+											consent.grantedClientScopes && consent.grantedClientScopes.length > 0 ? (
+												<Group key={consent.clientId || index} gap={4}>
+													{consent.grantedClientScopes.map((scope) => (
+														<Badge key={scope} variant="light">
+															{scope}
+														</Badge>
+													))}
+												</Group>
+											) : (
+												'-/-'
+											),
+											consent.createdDate ? new Date(consent.createdDate).toLocaleString() : '-/-',
+											consent.lastUpdatedDate ? new Date(consent.lastUpdatedDate).toLocaleString() : '-/-',
+										])
+									: [],
+							}}
+						/>
+					</TextCard>
+				</Flex>
 			</SimpleGrid>
 			<Title order={2} mt="xl" mb="md">
 				Build Teams and Applications
@@ -526,7 +638,7 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 				Permissions
 			</Title>
 			<Grid>
-				<GridCol span={{ base: 12, md: 4 }}>
+				<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
 					<TextCard
 						isText
 						title="Managed Build Teams"
@@ -546,7 +658,7 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 						/>
 					</TextCard>
 				</GridCol>
-				<GridCol span={{ base: 12, md: 4 }}>
+				<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
 					<TextCard
 						isText
 						title="Global Permissions"
@@ -559,7 +671,7 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 						/>
 					</TextCard>
 				</GridCol>
-				<GridCol span={{ base: 12, md: 4 }}>
+				<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
 					<TextCard
 						isText
 						title="Internal Groups"
@@ -568,6 +680,17 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 						style={{ height: '100%' }}
 					>
 						<PluralSingular count={keycloakGroupsData.length || 0} singular="Group" />
+					</TextCard>
+				</GridCol>
+				<GridCol span={{ base: 12, sm: 6, lg: 3 }}>
+					<TextCard
+						isText
+						title="Keycloak Roles"
+						icon={IconKey}
+						subtitle="effective realm and client roles"
+						style={{ height: '100%' }}
+					>
+						<PluralSingular count={keycloakRoles.length} singular="Role" />
 					</TextCard>
 				</GridCol>
 				<GridCol span={12}>
@@ -623,6 +746,42 @@ export default async function Page({ params }: { params: Promise<{ ssoId: string
 											canEdit={hasRole(session, 'edit-users')}
 										/>,
 									]),
+								}}
+							/>
+						</ScrollArea>
+					</TextCard>
+				</GridCol>
+				<GridCol span={12}>
+					<TextCard
+						title="Keycloak Roles"
+						icon={IconKey}
+						href={`https://auth.buildtheearth.net/admin/master/console/#/website/users/${ssoId}/role-mappings`}
+						hrefText="Edit in Keycloak"
+					>
+						<ScrollArea h="40vh" w="100%" type="always">
+							<Table
+								highlightOnHover
+								stickyHeader
+								data={{
+									head: ['Role Name', 'Container / Client', 'Composite'],
+									body: keycloakRoles.map((role) => {
+										const roleKey = role.id || `${role.container}/${role.name}`
+										return [
+											<Tooltip key={`${roleKey}-name`} label={role.description} disabled={!role.description}>
+												<Code color="blue">{role.name || '-/-'}</Code>
+											</Tooltip>,
+											<Badge
+												key={`${roleKey}-container`}
+												variant="light"
+												color={role.container === 'realm' ? 'grape' : 'cyan'}
+											>
+												{role.container}
+											</Badge>,
+											<Badge key={`${roleKey}-composite`} variant="light" color={role.composite ? 'teal' : 'gray'}>
+												{role.composite ? 'Composite' : 'Standard'}
+											</Badge>,
+										]
+									}),
 								}}
 							/>
 						</ScrollArea>
